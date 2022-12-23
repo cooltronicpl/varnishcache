@@ -5,7 +5,7 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching h
 
 Plugin can cache pages to HTML files and boost website performance by making Varnish Cache preloaded from sitemap on your server. You can use it with our [solution for our TSPConfig 3 hosting panel](https://github.com/cooltronicpl/-ispconfig3-varnish). Maybe you want to try run CraftCMS on WP Engine with Varnish (untested).
 
-[img][(https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg) =192x192]
+![Image](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg =192x192)
 
 This plugin generates static HTML files and purges Varnish Cache from your dynamic Craft CMS project. When HTML files generated, your webserver will serve that file instead of processing heavier and running every time PHP and SQL.
 
