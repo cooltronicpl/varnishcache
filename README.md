@@ -20,7 +20,7 @@ You can disable some URLs, or all website by regex.
 
 ## Requirements
 
-Varsion 2.x of plugin requires Craft CMS 4.x or later.
+Version 2.x of plugin requires Craft CMS 4.x or later.
 
 ## Varnish Cache HTML files overview
 
