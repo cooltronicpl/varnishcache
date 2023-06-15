@@ -1,6 +1,6 @@
 <?php
 /**
- * Varnish Cache Helper plugin for Craft CMS 3.x
+ * Varnish Cache Helper plugin for Craft CMS 3.x & 4.x
  *
  * Varnish Cache Helper Plugin with http & htttps
  *
@@ -22,8 +22,8 @@ class Settings extends Model
     public $purgeCache = 0;
     public $excludedUrlPaths = [];
     public $preloadSitemap = 0;
-    public $sitemapUrl = "sitemap.xml";
-
+    public $sitemap = ["sitemap.xml"];
+    public $resetQueue = 1;
     public function rules(): array
     {
         return [
@@ -34,7 +34,7 @@ class Settings extends Model
             [['cacheDuration'], 'integer'],
             [['cacheDuration'], 'required'],
             [['preloadSitemap'], 'boolean'],
-            [['sitemapUrl'], 'string']
+            [['resetQueue'], 'boolean'],
         ];
     }
 }

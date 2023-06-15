@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Varnish Cache Purge plugin for Craft CMS 3.x
+ * Varnish Cache Purge plugin for Craft CMS 3.x & 4.x
  *
  * Varnish Cache Purge Plugin with http & htttps
  *
@@ -32,10 +32,10 @@ class VarnishCacheService extends Component
         $this->uri = \Craft::$app->request->getParam('p', '');
         $this->siteId = \Craft::$app->getSites()->getCurrentSite()->id;
         $this->settings = VarnishCache::getInstance()->getSettings();
-    
+
 
         // listen for the custom event and call the preloadCacheFromSitemap() function when the event is triggered
-    
+
     }
 
     public function checkForCacheFile()
@@ -65,47 +65,47 @@ class VarnishCacheService extends Component
 
         // Check various conditions and return false if any of them are met
         switch (true) {
-                // forced mode in all cases when enabled
+            // forced mode in all cases when enabled
             case $this->settings->enableGeneral && $this->settings->forceOn == true:
                 break;
 
-                // Skip if we're running in devMode and not in force mode
+            // Skip if we're running in devMode and not in force mode
             case $app->config->general->devMode === true && $this->settings->forceOn == false:
                 return false;
 
-                // Skip if not enabled
+            // Skip if not enabled
             case $this->settings->enableGeneral == false:
                 return false;
 
-                // Skip if system is not on and not in force mode
+            // Skip if system is not on and not in force mode
             case !$app->getIsSystemOn() && $this->settings->forceOn == false:
                 return false;
 
-                // Skip if it's a CP Request
+            // Skip if it's a CP Request
             case $app->request->getIsCpRequest():
                 return false;
 
-                // Skip if it's an action Request
+            // Skip if it's an action Request
             case $app->request->getIsActionRequest():
                 return false;
 
-                // Skip if it's a preview request
+            // Skip if it's a preview request
             case $app->request->getIsLivePreview():
                 return false;
 
-                // Skip if it's a post request
+            // Skip if it's a post request
             case !$app->request->getIsGet():
                 return false;
 
-                // Skip if it's an ajax request
+            // Skip if it's an ajax request
             case $app->request->getIsAjax():
                 return false;
 
-                // Skip if route from element api
+            // Skip if route from element api
             case $this->isElementApiRoute():
                 return false;
 
-                // Skip if currently requested URL path is excluded
+            // Skip if currently requested URL path is excluded
             case $this->isPathExcluded():
                 return false;
         }
@@ -177,9 +177,9 @@ class VarnishCacheService extends Component
         if (!$this->canCreateCacheFile() || http_response_code() !== 200) {
             return;
         }
-		if (preg_match('/\badmin\b/i', $this->uri)){
-			return;
-		}
+        if (preg_match('/\badmin\b/i', $this->uri)) {
+            return;
+        }
         $cacheEntry = VarnishCachesRecord::findOne(['uri' => $this->uri, 'siteId' => $this->siteId]);
 
         if ($cacheEntry) {
@@ -268,11 +268,11 @@ class VarnishCacheService extends Component
         // \craft::Dd($elements);
         $cacheIds = array_map(function ($el) {
             return $el->cacheId;
-        }, $elements);        
-        \Craft::info('Varnish clearCacheUri Purge ids "' . implode(", ",$cacheIds) . '"');
+        }, $elements);
+        \Craft::info('Varnish clearCacheUri Purge ids "' . implode(", ", $cacheIds) . '"');
 
         //$cachesUri = VarnishCachesRecord::findAll(['uri' => $uri]);
-       //\Craft::info('Varnish clearCacheUri Purge ids "' . implode(", ",$cachesUri) . '"');
+        //\Craft::info('Varnish clearCacheUri Purge ids "' . implode(", ",$cachesUri) . '"');
 
         foreach ($cacheIds as $cache) {
             $file = $this->getCacheFileName($cache->uid);
@@ -301,11 +301,11 @@ class VarnishCacheService extends Component
         VarnishCachesRecord::deleteAll(['uri' => $cachesUri]);
         return null;
     }
-    public function clearCacheCustom($uri,$url)
+    public function clearCacheCustom($uri, $url)
     {
 
-       $cachesUri = VarnishCachesRecord::findAll(['uri' => $uri]);
-       \Craft::info('Varnish clearCacheCustom ids allUris "' . implode(", ",$cachesUri) . '"');
+        $cachesUri = VarnishCachesRecord::findAll(['uri' => $uri]);
+        \Craft::info('Varnish clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
 
 
         foreach ($cachesUri as $cache) {
@@ -335,14 +335,14 @@ class VarnishCacheService extends Component
         VarnishCachesRecord::deleteAll(['uri' => $cachesUri]);
         return null;
     }
-	
-	public function clearCacheCustomTimeout($uri,$url,$timeout)
+
+    public function clearCacheCustomTimeout($uri, $url, $timeout)
     {
-        $job = new ClearUriJob($uri,$url);
+        $job = new ClearUriJob($uri, $url);
         QueueSingleton::getInstance($job)->push($job, 1, $timeout, 1800);
         return null;
     }
-	
+
     /**
      * Clear all caches
      *
@@ -399,7 +399,7 @@ class VarnishCacheService extends Component
      * Check cache and return it if exists
      *
      * @param string $file
-     * @return mixed
+     * @return boolean
      */
     private function loadCache($file)
     {
@@ -408,7 +408,7 @@ class VarnishCacheService extends Component
         } elseif (!empty($this->settings->cacheDuration)) {
             $settings = ['cacheDuration' => ($this->settings->cacheDuration * 60)];
         } else {
-            $settings = ['cacheDuration' => (10*60)];
+            $settings = ['cacheDuration' => (10 * 60)];
         }
         if (time() - ($fmt = filemtime($file)) >= $settings['cacheDuration']) {
             unlink($file);
@@ -417,59 +417,110 @@ class VarnishCacheService extends Component
         \Craft::$app->response->data = file_get_contents($file);
         return true;
     }
+    /**
+     * Check is path excluded by provided path
+     *
+     * @param string $path
+     * @return boolean
+     */
+    private function isPathSExcluded($path)
+    {
+        // compare with excluded paths from the settings
+        if (!empty($this->settings->excludedUrlPaths)) {
+            foreach ($this->settings->excludedUrlPaths as $exclude) {
+                $excludePath = reset($exclude);
 
+                // check if the path is one of those of the settings
+                if ($path == $excludePath || preg_match('@' . $excludePath . '@', $path)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+    /**
+     * Check is url absolute
+     *
+     * @param string $url
+     * @return boolean
+     */
+
+    private function isAbsoluteUrl($url)
+    {
+        $parsedUrl = parse_url($url);
+        return isset($parsedUrl['scheme']);
+    }
+
+    /**
+     * Preaload Cache from Sitemap from plugin settings
+     * 
+     */
     public function preloadCacheFromSitemap()
     {
         $app = \Craft::$app;
 
+        $sitemaps = array();
+
         // Get the site's base URL
         $baseUrl = $app->sites->getCurrentSite()->baseUrl;
         if (file_exists($settingsFile = $this->getDirectory() . 'settings.json')) {
-            $sitemapUrl = json_decode(file_get_contents($settingsFile), true);
+            $settings = json_decode(file_get_contents($settingsFile), true);
+            foreach ($settings as $key => $sitemap) {
+                    $sitemaps[$key] = "{$baseUrl}/{$sitemap}";
+            }
+        } elseif (!empty($this->settings->sitemap)) {
+            $settings = $this->settings->sitemap;
+            foreach ($settings as $key => $sitemap) {
+                $sitemaps[$key] = "{$baseUrl}/{$sitemap}";
+            }
+        } else {
+            $sitemaps[] = ["{$baseUrl}/sitemap.xml"];
+        }
 
-            if (preg_match('~^https?://~', $sitemapUrl)) {
-                $sitemapUrl = implode('',['sitemapUrl' => $this->settings->sitemapUrl]);
-            } else {
-                $sitemapUrl = "{$baseUrl}/".implode('',['sitemapUrl' => $this->settings->sitemapUrl]);
+        // Initialize an empty array to hold all URLs from all sitemaps.
+        $allUrls = array();
+        foreach ($sitemaps as $sitemap) {
+            $content = file_get_contents($sitemap);
+            $xml = simplexml_load_string($content);
+            // Load the sitemap XML and extract the URLs
+            foreach ($xml as $urlElement) {
+                // Convert the SimpleXMLElement to a string
+                $url = (string) $urlElement->loc;
+                if (!$this->isAbsoluteUrl($url)) {
+                    // If the URL is relative, treat it as a path and check if it's excluded
+                    if ($this->isPathExcluded($url)) {
+                        continue;
+                    }
+                } else {
+                    $parsedUrl = parse_url($url);
+                    $path = $parsedUrl['path'] ?? '';
+                    // Skip this URL if it's excluded
+                    if ($this->isPathExcluded($path)) {
+                        continue;
+                    }
+                }
+                $allUrls[] = $url;
             }
         }
-        elseif (!empty($this->settings->sitemapUrl)) {
 
-            $sitemapUrl = ['sitemapUrl' => $this->settings->sitemapUrl];
-            $url = implode('', $sitemapUrl);
-
-            if (preg_match('~^https?://~', $url)) {
-                $sitemapUrl = implode('',['sitemapUrl' => $this->settings->sitemapUrl]);
-            } else {
-                $sitemapUrl = "{$baseUrl}/".implode('',['sitemapUrl' => $this->settings->sitemapUrl]);
-            }
-         } else {
-            $sitemapUrl = "{$baseUrl}/sitemap.xml";
-         }
-
-        // Load the sitemap XML and extract the URLs
-        $content = file_get_contents($sitemapUrl);
-
-        // parse the sitemap content to object
-        $xml = simplexml_load_string($content);
-        $urls = array();
         // retrieve properties from the sitemap object
-        foreach ($xml->url as $urlElement) {
-            // get properties
-            $urls[]=$urlElement->loc;
-        }
-
-        \Craft::info('Vanish Cache Preload urls: "' . implode(", ",$urls) . '"');
+        \Craft::info('Vanish Cache Preload urls '.implode(", ",$sitemaps));
 
         // Preload cache for Sitemap the URLs
-        $this->preloadCache($urls);
+        $this->preloadCache($allUrls);
     }
 
+    /**
+     * Preaload Cache from:
+     * @param array $urls
+     * 
+     */
     public function preloadCache(array $urls)
     {
         $app = \Craft::$app;
         $this->createCacheFile();
-        
+
         // Create a new cURL handle
         $curl = curl_init();
 
@@ -493,6 +544,6 @@ class VarnishCacheService extends Component
         // Close the cURL handle
         curl_close($curl);
         \Craft::info('Vanish Cache Preload ended"');
-        
+
     }
 }
