@@ -1,68 +1,107 @@
 
-# Varnish Cache Helper Plugin for CraftCMS 4.x with our ISP Config 3 Varnish SSL plugin
+# Varnish Cache Helper Plugin for Craft CMS
 
-With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com)
+With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
 
-Plugin can cache pages to HTML files and boost website performance by making Varnish Cache preloaded from sitemap on your server. You can use it with our [solution for our TSPConfig 3 hosting panel](https://github.com/cooltronicpl/-ispconfig3-varnish). Maybe you want to try run CraftCMS on WP Engine with Varnish (untested).
+![Varnish Cache Helper Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
 
-<img src="https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg" width="192" />
+## Table of Contents
 
-This plugin generates static HTML files and purges Varnish Cache from your dynamic Craft CMS project. When HTML files generated, your webserver will serve that file instead of processing heavier and running every time PHP and SQL.
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Preloading Server Cache from Sitemap](#preloading-server-cache-from-sitemap)
+  - [Configuring Varnish Cache](#configuring-varnish-cache)
+  - [Using Varnish Cache](#using-varnish-cache)
+  - [Disabling or Clearing Some URL](#disabling-or-clearing-some-url)
+- [FAQ](#faq)
+- [Support](#support)
+- [Contribution](#contribution)
+- [License](#license)
+- [Changelog](#changelog)
 
-Your visitors and Google served without running any code or database queries. Everything preloaded from your sitemap. Cached files and Varnish improve your Core Web Vitals dramatically. That could be some POST request (like AJAX forms) like:
+## Features
 
-* sections with a login, carts, some contact forms should not beeing cached, it needs testing
-* the admin panel is also NOT cached
+- **Static HTML Generation**: Generates static HTML files from your dynamic CMS projects, improving page load times and Core Web Vitals.
+- **Varnish Cache Purging**: Purges the Varnish cache, ensuring that your website always serves the most recent version of your files.
+- **Caching Helper Solution**: Provides a caching helper solution, making it easy to manage your cache and improve the performance of your website.
 
-## Disabling HTML Cache
+## Installation
 
-You can disable some URLs, or all website by regex.
+To install this plugin, copy the following command to your terminal:
 
-## Requirements
+```
+composer require cooltronicpl/varnishcache
+```
+You can also install the plugin directly from the [Craft CMS plugin store](https://plugins.craftcms.com/varnishcache/).
 
-Version 2.x of plugin requires Craft CMS 4.x or later.
+## Usage
 
-## Varnish Cache HTML files overview
+This section provides detailed instructions and examples on how to use the Varnish Cache Helper Plugin.
 
-Creates HTML Cached page for any non-cp GET request for the duration of one hour (60 minutes, wchich is configurable) or until an entry is updated. To work in DEV-mode: use the force option in the settings. You can use preload to make cache automatically, when you need to have sitemap.xml file and point to it in plugin settings (it may be URL from other domain, some XML file).
+### Preloading Server Cache from Sitemap
 
-## Preaload server cache from sitemap
+The preloading of the server cache from the sitemap is initiated once the settings in the plugin options are enabled. The plugin adds the target URLs from the sitemap to a queue for preloading. However, if CraftCMS 4 or 3 is not active, the next iteration of preload may be paused. After the next login to the admin panel, the preload cron will resume. This ensures that all your sites are continuously preloaded in the Varnish Server with PURGE and the static HTML Cache is recreated. For sites with long initial generation times, such as those generating PDFs with your plugin, the preload is initiated on the first website listed in the sitemap.xml. The duration between preloads can be adjusted from the default value of 60 minutes.
 
-It is runned after enabling settings in plugin options. Now it is added Queue target urls from sitemap is preloaded, but when CraftCMS 4 is not active, next iteration of preload may be sleeped. After logging next time into admin panel, preload cron will resume. So all the time, all of your sites should been preloaded in Varnish Server with PURGE and recreated static HTML Cache. Very long first generated sites in example with [generation of PDFs in your plugin](https://github.com/cooltronicpl/Craft-document-helpers) were run on first website on sitemap.xml website preaload. Duration between preload can changed from default value of 60 minutes.
+### Configuring Varnish Cache
 
-## Configuring Varnish Cache
+The plugin works out of the box and does not require special cache tags, unless you want to disable Varnish. If DevMode in Craft CMS is enabled, you will need to manually enable the plugin by activating the 'Force On' setting in the plugin. You can also exclude certain URL paths from generating HTML files.
 
-Plugin works out of the box no special cache tags are needed, it may be needed when you want to disable Varnish. If DevMode in Craft CMS is enabled, you will have to force enable the plugin by enable the 'Force On' plugin setting. You can also exclude url path(s) from being generated HTML files.
+### Using Varnish Cache
 
-## Using Varnish Cache
+Varnish Cache has a settings page where you can enable or disable it and flush the cache. If the plugin is working correctly, you will see the cached files in the `storage/runtime/varnishcache/` folder. To check the performance improvement, please use the browser inspector. There, you will be able to see the improved loading times.
 
-Varnish Cache has a settings page where you can enable or disable it and flush the cache. If the plugin works correctly you will see the cached files in storage/runtime/varnishcache/ folder. To check the performance improvement please use the browser inspector. There you will be able to see that the loading times are improved.
+### Disabling or Clearing Some URL
 
-## Disable or clear some URL
-
-To disable actual page Varnish Cache, also you can disable this slug in admin panel or all website HTML files creation via REGEX.
+To disable Varnish Cache for a specific page, you can disable this slug in the admin panel or prevent the creation of HTML files for the entire website using REGEX.
 
 ```
 {% header "Cache-Control: no-cache" %}
 {% header "Pragma: no-cache" %}
 ```
 
-To clear some URL with Varnish and some linked HTML files, this is executed by Craft Job Queue with delay you pass with last argument: ```clearCustomUrlUriTimeout(SLUG to unlink HTML file, VARNISH URL to clear,timeout)```
+To clear a specific URL with Varnish and some linked HTML files, this is executed by the Craft Job Queue with a delay that you specify as the last argument in the `clearCustomUrlUriTimeout` function.
 
+Example:
 ```
 {{ craft.varnish.clearCustomUrlUriTimeout("test", "https://domain.com/test/",10) }}
 ```
 
-## License
-
-### Craft License
-
-Copyright © [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) more in [LICENSE.md file](https://github.com/cooltronicpl/varnishcache/LICENSE.md).
+This command will clear the cache for the URL https://domain.com/test/ after a delay of 10 seconds.
 
 ## FAQ
 
 **Q:** Are all cache files deleted when updating an entry, or only the ones with a relation?
 **A:** Only related cache files will be deleted and sites preloaded via Varnish after an update.
 
-**Q:** The installation fails and plugin does not work. **  
+**Q:** The installation fails and plugindoes not work.  
 **A:** Make sure that the folder `storage/runtime/varniscache` is created and there are read/write permissions.
+
+**Q:** How to set Varnish Server?
+**A:** You can use the vcl file from [our project](https://github.com/cooltronicpl/-ispconfig3-varnish/blob/master/etc/varnish/default.vcl) which contains a modified WordPress Purge mechanism for Craft CMS.
+
+**Q:** Which branch should I install for my Craft CMS?
+**A:** The 1.x branch is suitable for Craft CMS 3, whereas the 2.x branch is for Craft CMS 4.
+
+**Q:** My Preloading CRON failed. What could be the reason?
+**A:** The failure could be due to the inaccessibility of the sitemap.xml file or poorly formatted entries within it.
+
+## Support
+
+If you encounter any issues or have questions about the plugin, please create an issue in the GitHub repository or contact us directly at craft@cooltronic.pl.
+
+## Contribution
+
+We welcome contributions to the Varnish Cache Helper plugin. Please read our contribution guidelines and submit your pull requests.
+
+## License
+
+This project is licensed under the Craft License. See the [LICENSE.md](https://github.com/cooltronicpl/varnishcache/LICENSE.md) file for details.
+
+## Changelog
+
+See the [CHANGELOG.md](https://github.com/cooltronicpl/varnishcache/blob/master/CHANGELOG.md) file for a list of changes in each version of the plugin.
+
+---
+
+Copyright © [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl)

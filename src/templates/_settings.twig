@@ -64,13 +64,25 @@
     on:        settings.preloadSitemap
 }) }}
 
-{{ forms.textField({
-    label:        "Sitemap URL for preload after cache expire" | t,
-    id:           'sitemapUrl',
-    name:         'sitemapUrl',
+{{ forms.editableTableField({
+    label:        "Sitemap URL array for preload after cache expire" | t,
+    id:           'sitemap',
+    name:         'sitemap',
     instructions: "URL of sitemap"|t,
-    value:        settings.sitemapUrl,
-    errors:       settings.getErrors('sitemapUrl')
+    cols:           [
+                        {
+                            heading: 'Sitemaps XML paths' | t,
+                            info: 'Enter a URL of sitemap.xml' | t,
+                            type: 'text',
+                            placeholder: './sitemap.xml or https://domain.com/sitemap.xml*',
+                        },
+                    ],
+    rows:           settings.sitemap,
+    errors:         settings.getErrors('sitemap'),
+    minRows: 0,
+	allowAdd: true,
+    allowReorder: true,
+    allowDelete: true
 }) }}
 
 {{ forms.editableTableField({
@@ -94,8 +106,17 @@
                     ],
     rows:           settings.excludedUrlPaths,
     errors:         settings.getErrors('excludedUrlPaths'),
-    minRows: 1,
+    minRows: 0,
 	allowAdd: true,
     allowReorder: true,
     allowDelete: true
+}) }}
+
+{{ forms.lightswitchField({
+    label:        'Enable Global Queue Resseting (make CRON job to make preload of XML file)' | t,
+    id:           'resetQueue',
+    name:         'resetQueue',
+    instructions: 'Enable' | t,
+    errors:       settings.getErrors('resetQueue'),
+    on:        settings.resetQueue
 }) }}

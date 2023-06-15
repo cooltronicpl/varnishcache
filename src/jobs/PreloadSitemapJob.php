@@ -3,7 +3,7 @@
 namespace cooltronicpl\varnishcache\jobs;
 
 /**
- * Varnish Cache Helper plugin for Craft CMS 3.x
+ * Varnish Cache Helper plugin for Craft CMS 3.x & 4.x
  *
  * Varnish Cache Helper Plugin with http & htttps
  *
@@ -32,9 +32,11 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
             $this->myInit();
 
             $this->hasRun = true;
-            $now = \Craft::$app->formatter->asDatetime(time());
-            $queue = \Yii::$app->queue;
-
+            if (VarnishCache::getInstance()->getSettings()->resetQueue==true)
+            {
+                $now = \Craft::$app->formatter->asDatetime(time());
+                $queue = \Yii::$app->queue;
+            }
             \Craft::info('Before Varnish Execution loop: "' . $now . '"');
 
             // delete cache files and preload the cache from the sitemap
@@ -46,14 +48,19 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
             } else {
                 $duration = 60;
             }
-            $nextTask = QueueSingleton::getInstance();
-            // Delete all tasks
-            $queue->releaseAll();
+            if (VarnishCache::getInstance()->getSettings()->resetQueue==true)
+            {
+                $nextTask = QueueSingleton::getInstance();
+                // Delete all tasks
+                $queue->releaseAll();
+            }
             $this->hasRun = false;
-            $nextTask->push(new PreloadSitemapJob(), 1, $duration, 1800, $queue);
-            $now = \Craft::$app->formatter->asDatetime(time());
-            \Craft::info('After Varnish Execution loop: "' . $now . '"');
-
+            if (VarnishCache::getInstance()->getSettings()->resetQueue==true)
+            {
+                $nextTask->push(new PreloadSitemapJob(), 1, $duration, 1800, $queue);
+                $now = \Craft::$app->formatter->asDatetime(time());
+                \Craft::info('After Varnish Execution loop: "' . $now . '"');
+            }
         }
     }
     

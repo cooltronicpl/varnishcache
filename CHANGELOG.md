@@ -1,7 +1,6 @@
 # Varnish Cache Helper Changelog
 
-## 2.0.1 26-12-2022
-- Update plugin names
+## 1.0.0 14-06-2023
 
-## 2.0.0 23-12-2022
-- Initial Varnish Cache helper for Craft 4.x
+- Initial release of Varnish Cache Helper for Craft CMS 3.x.
+- This version is equivalent to version 2.1.0 from the 2.x branch.

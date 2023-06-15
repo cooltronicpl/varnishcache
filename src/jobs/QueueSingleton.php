@@ -2,7 +2,7 @@
 namespace cooltronicpl\varnishcache\jobs;
 
 /**
- * Varnish Cache Helper plugin for Craft CMS 3.x
+ * Varnish Cache Helper plugin for Craft CMS 3.x & 4.x
  *
  * Varnish Cache Helper Plugin with http & htttps
  *

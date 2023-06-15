@@ -3,16 +3,16 @@
 /**
  * Varnish Cache Helper plugin for Craft CMS 3.x
  *
- * Varnish Cache Helper Plugin with http & htttps
+ * Varnish Cache Helper Plugin with HTTP & HTTPS support
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 
 namespace cooltronicpl\varnishcache;
 
-
+use Craft;
 use craft\base\Plugin;
 use craft\web\Response;
 use craft\services\Plugins;
@@ -21,87 +21,31 @@ use craft\services\Elements;
 use craft\helpers\FileHelper;
 use cooltronicpl\varnishcache\services\VarnishCacheService;
 use cooltronicpl\varnishcache\models\Settings;
-
 use yii\base\Event;
 use craft\elements\db\ElementQuery;
 use cooltronicpl\varnishcache\jobs\QueueSingleton;
-
-
 use cooltronicpl\varnishcache\records\VarnishCachesRecord;
 use cooltronicpl\varnishcache\records\VarnishCacheElementRecord;
 use cooltronicpl\varnishcache\variables\VarnishCacheClear;
-
 use craft\elements\User;
 use craft\elements\GlobalSet;
 use cooltronicpl\varnishcache\jobs\PreloadSitemapJob;
 use craft\web\twig\variables\CraftVariable;
 
-/**
- * Craft plugins are very much like little applications in and of themselves. We’ve made
- * it as simple as we can, but the training wheels are off. A little prior knowledge is
- * going to be required to write a plugin.
- *
- * For the purposes of the plugin docs, we’re going to assume that you know PHP and SQL,
- * as well as some semi-advanced concepts like object-oriented programming and PHP namespaces.
- *
- * https://craftcms.com/docs/plugins/introduction
- *
- * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
- * @package   VarnishCache
- * @since     1.0.0
- *
- */
 class VarnishCache extends Plugin
 {
-    // Static Properties
-    // =========================================================================
-
-    /**
-     * Static property that is an instance of this plugin class so that it can be accessed via
-     * VarnishCache::$plugin
-     *
-     * @var VarnishCache
-     */
     public static $plugin;
-    public string $schemaVersion = '1.0.0';
-    public bool $allowAnonymous = true;
-    public bool $hasCpSettings = true;
-    public $job;
-    // Public Methods
-    // =========================================================================
+    public $schemaVersion = '1.0.0';
+    public $hasCpSettings = true;
 
-    /**
-     * Returns whether the plugin should get its own tab in the CP header.
-     *
-     * @return bool
-     */
-    public function hasCpSection()
-    {
-        return false;
-    }
-
-    public function hasSettings()
-    {
-        return true;
-    }
-
-    /**
-     * @return Settings
-     */
     protected function createSettingsModel(): Settings
     {
         return new Settings();
     }
 
-    /**
-     * @return string
-     * @throws \yii\base\Exception
-     * @throws \Twig_Error_Loader
-     * @throws \RuntimeException
-     */
     protected function settingsHtml(): string
     {
-        return \Craft::$app->getView()->renderTemplate(
+        return Craft::$app->getView()->renderTemplate(
             'varnishcache/_settings',
             [
                 'settings' => $this->getSettings(),
@@ -109,9 +53,6 @@ class VarnishCache extends Plugin
         );
     }
 
-    /**
-     * Init plugin and initiate events
-     */
     public function init()
     {
         self::$plugin = $this;
