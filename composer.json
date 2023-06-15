@@ -1,8 +1,8 @@
 {
     "name": "cooltronicpl/varnishcache",
-    "description": "This plugin purges Varnish Cache (http & https) on Craft CMS 4.",
+    "description": "This plugin helps with Varnish Cache Server on Craft CMS 4 or 3.",
     "type": "craft-plugin",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "keywords": [
         "craft",
         "cms",
