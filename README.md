@@ -1,9 +1,9 @@
 
-# Varnish Cache Helper Plugin for Craft CMS
+# Varnish Cache with Preload (Preheat) to static HTML Plugin for Craft CMS
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
 
-![Varnish Cache Helper Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
+![Varnish Cache with Preload (Preheat) to static HTML Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
 
 ## Table of Contents
 
@@ -15,6 +15,13 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching h
   - [Using Varnish Cache](#using-varnish-cache)
   - [Disabling or Clearing Some URL](#disabling-or-clearing-some-url)
 - [FAQ](#faq)
+  - [Q: Are all cache files deleted when updating an entry, or only the ones with a relation?](#q-are-all-cache-files-deleted-when-updating-an-entry-or-only-the-ones-with-a-relation)
+  - [Q: The installation fails and plugin does not work.](#q-the-installation-fails-and-plugin-does-not-work)
+  - [Q: How to set Varnish Server?](#q-how-to-set-varnish-server)
+  - [Q: Which branch should I install for my Craft CMS?](#q-which-branch-should-i-install-for-my-craft-cms)
+  - [Q: My Preloading CRON failed. What could be the reason?](#q-my-preloading-cron-failed-what-could-be-the-reason)
+  - [Q: Some URL Preloading failed?](#q-some-url-preloading-failed)
+  - [Q: How to reset Cache?](#q-how-to-reset-cache)
 - [Support](#support)
 - [Contribution](#contribution)
 - [License](#license)
@@ -37,7 +44,7 @@ You can also install the plugin directly from the [Craft CMS plugin store](https
 
 ## Usage
 
-This section provides detailed instructions and examples on how to use the Varnish Cache Helper Plugin.
+This section provides detailed instructions and examples on how to use the Varnish Cache with Preload (Preheat) to static HTML Helper Plugin.
 
 ### Preloading Server Cache from Sitemap
 
@@ -71,20 +78,29 @@ This command will clear the cache for the URL https://domain.com/test/ after a d
 
 ## FAQ
 
-**Q:** Are all cache files deleted when updating an entry, or only the ones with a relation?
-**A:** Only related cache files will be deleted and sites preloaded via Varnish after an update.
+### Q: Are all cache files deleted when updating an entry, or only the ones with a relation?
+A: Only related cache files will be deleted and sites preloaded via Varnish after an update.
 
-**Q:** The installation fails and plugi ndoes not work.  
-**A:** Make sure that the folder `storage/runtime/varniscache` is created and there are read/write permissions.
+### Q: The installation fails and plugin does not work.   
+A: Make sure that the folder `storage/runtime/varniscache` is created and there are read/write permissions.
 
-**Q:** How to set Varnish Server?
-**A:** You can use the vcl file from [our project](https://github.com/cooltronicpl/-ispconfig3-varnish/blob/master/etc/varnish/default.vcl) which contains a modified WordPress Purge mechanism for Craft CMS.
+### Q: How to set Varnish Server?
+A: You can use the vcl file from [our project](https://github.com/cooltronicpl/-ispconfig3-varnish/blob/master/etc/varnish/default.vcl) which contains a modified WordPress Purge mechanism for Craft CMS.
 
-**Q:** Which branch should I install for my Craft CMS?
-**A:** The 1.x branch is suitable for Craft CMS 3, whereas the 2.x branch is for Craft CMS 4.
+### Q: Which branch should I install for my Craft CMS?
+A: The 1.x branch is suitable for Craft CMS 3, whereas the 2.x branch is for Craft CMS 4.
 
-**Q:** My Preloading CRON failed. What could be the reason?
-**A:** The failure could be due to the inaccessibility of the sitemap.xml file or poorly formatted entries within it.
+### Q: My Preloading CRON failed. What could be the reason?
+
+A: The failure could be due to the inaccessibility of the `sitemap.xml` file or poorly formatted entries within it. Please check the `sitemap.xml` file for any potential issues.
+
+### Q: Some URL Preloading failed?
+
+A: If some URL preloading is failing, you can try to increase the preload time in the Preloading Tab. If the problem persists, consider disabling the preload for the affected page.
+
+### Q: How to reset Cache?
+
+A: To reset the cache, navigate to the settings and enable the **Purge all Cache now?** option. Don't forget to click "Save" to apply the changes.
 
 ## Support
 
@@ -92,7 +108,7 @@ If you encounter any issues or have questions about the plugin, please create an
 
 ## Contribution
 
-We welcome contributions to the Varnish Cache Helper plugin. Please read our contribution guidelines and submit your pull requests.
+We welcome contributions to the Varnish Cache with Preload (Preheat) to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
 
 ## License
 

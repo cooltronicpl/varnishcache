@@ -3,12 +3,12 @@
 namespace cooltronicpl\varnishcache\jobs;
 
 /**
- * Varnish Cache Helper plugin for Craft CMS 3. & 4.x
+ * Varnish Cache with Preload (Preheat) to static HTML Helper plugin for Craft CMS 3. & 4.x
  *
- * Varnish Cache Helper Plugin with http & htttps
+ * Varnish Cache with Preload (Preheat) to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 
@@ -32,30 +32,17 @@ class ClearUriJob extends \craft\queue\BaseJob
     public function execute($queue): void
     {
         $cachesUri = VarnishCachesRecord::findAll(['uri' => $this->uri]);
-		\Craft::info('Varnish clearCustomUrlUriTimeout ids allUris "' . implode(", ",$cachesUri) . '"');
-
+		\Craft::info('clearCustomUrlUriTimeout ids allUris "' . implode(", ",$cachesUri) . '"');
+        $app = \Craft::$app;
+        $baseUrl = $app->sites->getCurrentSite()->baseUrl;
 		foreach ($cachesUri as $cache) {
 			$file = $this->getCacheFileName($cache);
-			\Craft::info('Varnish clearCustomUrlUriTimeout file "' . $file . '"');
+			\Craft::info('clearCustomUrlUriTimeout file "' . $file . '"');
 
-			$purgeurl = $this->url;
-			$varnishurl = $purgeurl;
-			$varnishhost = 'Host: ' . $_SERVER['SERVER_NAME'];
-			$varnishcommand = "PURGE";
-
-			$curl = curl_init($varnishurl);
-			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishcommand);
-			curl_setopt($curl, CURLOPT_ENCODING, $varnishhost);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, false);
-			$result = curl_exec($curl);
-			curl_close($curl);
-			\Craft::info('Varnish clearCustomUrlUriTimeout Purge response: ' . $result . ' file: ' . $file);
-
-			if (file_exists($file)) {
-				@unlink($file);
-			}
+			VarnishCacheService::clearVarnishUrl($baseUrl.$this->uri);
 		}
 
+		VarnishCacheService::clearVarnishUrl($this->url);
 
 		// delete caches for related entry
 		VarnishCachesRecord::deleteAll(['uri' => $cachesUri]);
