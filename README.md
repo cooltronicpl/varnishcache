@@ -1,9 +1,9 @@
 
-# Varnish Cache with Preload (Preheat) to static HTML Plugin for Craft CMS
+# Varnish Cache with Preload to HTML Plugin for Craft CMS
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
 
-![Varnish Cache with Preload (Preheat) to static HTML Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
+![Varnish Cache with Preload to HTML Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
 
 ## Table of Contents
 

@@ -1,4 +1,9 @@
-# Varnish Cache with Preload (Preheat) to static HTML Changelog
+# Varnish Cache with Preload to HTML Changelog
+
+## 2.2.1 2023-06-17
+
+- **Bugfix**: Modified the cURL mechanism to prevent the display of Varnish purge information.
+- **Bugfix**: Fixed an issue within the Varnish cache clearing function.
 
 ## 2.2.0 2023-06-17
 
@@ -24,6 +29,11 @@
 ## 2.0.0 2022-12-23
 
 - Initial Varnish Cache with Preload (Preheat) to static HTML Helper for Craft 4.x
+
+## 1.1.1 2023-06-17
+
+- **Bugfix**: Modified the cURL mechanism to prevent the display of Varnish purge information.
+- **Bugfix**: Fixed an issue within the Varnish cache clearing function.
 
 ## 1.1.0 2023-06-17
 

@@ -19,20 +19,17 @@ class PreloadCacheJob extends BaseJob
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-
-        $res = curl_exec($ch);
-
-        if ($res === false) {
+    
+        if(curl_exec($ch) === false) {
             $error = curl_error($ch);
             \Craft::error('Preload Error: ' . var_dump($error));
             throw new \Exception('Failed to preload cache for URL: ' . $this->url . '. Error: ' . $error);
         } else {
-            \Craft::info('Preload - Successful for URL: ' . $this->url);
+             \Craft::info('Preload - Successful for URL: ' . $this->url);
         }
-
+    
         curl_close($ch);
     }
-
     protected function defaultDescription(): string
     {
         return 'Preloading cache for URL: ' . $this->url;
