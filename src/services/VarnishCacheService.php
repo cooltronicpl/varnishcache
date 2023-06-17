@@ -200,6 +200,7 @@ class VarnishCacheService extends Component {
             // Update the cacheSize field of the $cacheEntry instance
             $cacheEntry->cacheSize = filesize($file);
             $cacheEntry->save();
+            $app = \Craft::$app;
             $this->clearVarnishUrl($app->sites->getCurrentSite()->baseUrl.$this->uri);
 
         } else {
@@ -602,13 +603,12 @@ class VarnishCacheService extends Component {
             curl_setopt($curl, CURLOPT_HTTPHEADER, array($varnishhost));
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishcommand);
             curl_setopt($curl, CURLOPT_ENCODING, $varnishhost);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, false);
-            $result = curl_exec($curl);
-            if ($result === false) {
-                \Craft::error('Purge cURL Error: ' . var_dump(curl_error($curl)).", purgeUrl: ". $purgeurl . ", varnishUrl" . $varnishurl .'"');
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            if (curl_exec($curl) === false) {
+                \Craft::error('Purge cURL Error: ' . var_dump(curl_error($curl)).", purgeUrl: ". $purgeurl . ", varnishUrl" . $varnishurl );
             }
-            \Craft::info('Purge response "' . var_export($result) . " , curl_exec:".var_export(curl_getinfo($curl)) .", purgeUrl: ".$purgeurl . ", varnishUrl: " . $varnishurl .'"' );
-                    curl_close( $curl );
-                }
-            }
+            \Craft::info('Purge response purgeUrl: '.$purgeurl . ", varnishUrl: " . $varnishurl );
+            curl_close( $curl );
         }
+    }
+}

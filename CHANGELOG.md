@@ -1,5 +1,10 @@
 # Varnish Cache with Preload (Preheat) to static HTML Changelog
 
+## 1.1.1 2023-06-17
+
+- **Bugfix**: Modified the cURL mechanism to prevent the display of Varnish purge information.
+- **Bugfix**: Fixed an issue within the Varnish cache clearing function.
+
 ## 1.1.0 2023-06-17
 
 - **Improvement:** Refactored many plugin functions for enhanced performance and clarity.

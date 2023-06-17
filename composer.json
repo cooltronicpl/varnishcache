@@ -1,8 +1,8 @@
 {
     "name": "cooltronicpl/varnishcache",
-    "description": "This plugin helps with Varnish Cache Server or make Preload of sitemaps into HTML static files instead of loading page with PHP on Craft CMS 4 or 3.",
+    "description": "The Varnish Cache plugin for Craft CMS is an advanced tool that enhances your website's performance by generating static HTML files and optional purging the Varnish cache.",
     "type": "craft-plugin",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "keywords": [
         "craft",
         "cms",
@@ -28,7 +28,7 @@
         }
     },
     "extra": {
-        "name": "Varnish Cache with Preload (Preheat) to static HTML Helper",
+        "name": "Varnish Cache with Preload to HTML",
         "handle": "varnishcache",
         "schemaVersion": "1.0.0",
         "hasCpSettings": true,
