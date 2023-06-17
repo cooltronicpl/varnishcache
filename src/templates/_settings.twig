@@ -1,5 +1,30 @@
-{% import "_includes/forms" as forms %}
+{% extends "varnishcache/_layouts/cpp.twig" %}
 
+{% import "_includes/forms" as forms %}
+{% set title = 'Varnish Cache with Preload (Preheat) to static HTML' %}
+
+{% set selectedTab = 'general' %}
+
+{% set title = 'Varnish Cache with Preload (Preheat) to static HTML Helper and HTML Cache Generator' %}
+
+{% set tabs = {
+    general: {label: 'General'|t, url: '#general'},
+        preload: {label: 'Preload (Preheat)'|t, url: '#preload'},
+
+    cron: {label: 'CRON'|t, url: '#cron'},
+    varnish: {label: 'Varnish'|t, url: '#varnish'},
+
+    stats: {label: 'Statistics'|t, url: '#stats'}
+} %}
+{% block content %}
+
+<div class="tab-contents">
+            <div id="content-general" class="tab-content">
+
+
+ <h2>General Settings</h2>
+
+        
 {{ forms.lightswitchField({
     label:        "Enable Varnish Cache Plugin?" | t,
     id:           'enableGeneral',
@@ -34,14 +59,14 @@
     name:         'cacheDuration',
     instructions: "Amount of minutes a Cached Request is valid, and if Preload is active interval peroid between preloads"|t,
     value:        settings.cacheDuration,
-    errors:       settings.getErrors('honeypotField')
+    errors:       settings.getErrors('cacheDuration')
 }) }}
 
 {{ forms.lightswitchField({
-    label:        "Purge Cache now?" | t,
+    label:        "Purge all Cache now?" | t,
     id:           'purgeCache',
     name:         'purgeCache',
-    instructions: "Purge all current cached files" | t,
+    instructions: "Purge all current cached files (with Varnish Clear from of Sitemaps if Enabled)" | t,
 }) }}
 
 {% set siteOptions = [{
@@ -54,6 +79,8 @@
         value: site.id,
     }]) %}
 {% endfor %}
+</div>
+            <div id="content-preload" class="tab-content">
 
 {{ forms.lightswitchField({
     label:        "Enable preload from sitmemap in xml format?" | t,
@@ -65,16 +92,16 @@
 }) }}
 
 {{ forms.editableTableField({
-    label:        "Sitemap URL array for preload after cache expire" | t,
+    label:        "Sitemap relaive paths array for preload after cache expire" | t,
     id:           'sitemap',
     name:         'sitemap',
-    instructions: "URL of sitemap"|t,
+    instructions: "Path of sitemap to preload with a precise relative path like: 'sitemap.xml' "|t,
     cols:           [
                         {
                             heading: 'Sitemaps XML paths' | t,
-                            info: 'Enter a URL of sitemap.xml' | t,
+                            info: 'Enter a precise URL of sitemap without the <span class="code">siteURL</span> part as they are returned by <span class="code">\Craft::$app->request->getFullPath()</span>, like "sitemap_index.xml" insteadof "https://example.com/sitemap_index.xml".' | t,
                             type: 'text',
-                            placeholder: './sitemap.xml or https://domain.com/sitemap.xml*',
+                            placeholder: 'sitemap.xml',
                         },
                     ],
     rows:           settings.sitemap,
@@ -86,16 +113,16 @@
 }) }}
 
 {{ forms.editableTableField({
-    label:          'Excluded URL paths' | t,
-    instructions:   'Paths to be excluded from being cached, feel free to enter regular expressions as well as precise URL paths.' | t,
+    label:          'Excluded paths' | t,
+    instructions:   'Paths to be excluded from being cached, you can enter regular expressions "/page/.*" as well as precise URL paths like: "/page/to/be/excluded".' | t,
     name:           'excludedUrlPaths',
     id:             'excludedUrlPaths',
     cols:           [
                         {
-                            heading: 'Excluded paths' | t,
-                            info: 'Enter precise URL paths or regular expressions without the <span class="code">siteURL</span> part as they are returned by <span class="code">\Craft::$app->request->getFullPath()</span>, like "any/page" insteadof "https://example.com/site-specific/path/any/page".' | t,
+                            heading: 'Excluded precise relative paths' | t,
+                            info: 'Enter a precise URL paths or regular expressions without the <span class="code">siteURL</span> part as they are returned by <span class="code">\Craft::$app->request->getFullPath()</span>, like "/any/page" insteadof "https://example.com/site-specific/path/any/page".' | t,
                             type: 'singleline',
-                            placeholder: 'path/to/excluded/page OR regex like path/.*/excluded/.*',
+                            placeholder: '/path/to/excluded/page OR regex like /path/.*/excluded/.*',
                         },
                         {
                             heading: 'Multi-site' | t,
@@ -111,7 +138,18 @@
     allowReorder: true,
     allowDelete: true
 }) }}
-
+</div>
+            <div id="content-cron" class="tab-content">
+        {{ forms.textField({
+    label:        "Default Cache Expiration time" | t,
+    id:           'interval',
+    name:         'interval',
+    instructions: "Amount of seconds between Preload request (when Preloads fails make bigger value)"|t,
+    value:        settings.interval,
+    min: 2,
+    max: 99,
+    errors:       settings.getErrors('interval')
+}) }}
 {{ forms.lightswitchField({
     label:        'Enable Global Queue Resseting (make CRON job to make preload of XML file)' | t,
     id:           'resetQueue',
@@ -120,3 +158,76 @@
     errors:       settings.getErrors('resetQueue'),
     on:        settings.resetQueue
 }) }}
+</div>
+
+            <div id="content-varnish" class="tab-content">
+
+{{ forms.lightswitchField({
+    label:        'Enable default Varnish Cache Clearing via PURGE' | t,
+    id:           'enableVarnish',
+    name:         'enableVarnish',
+    instructions: 'Enable' | t,
+    errors:       settings.getErrors('enableVarnish'),
+    on:        settings.enableVarnish
+}) }}
+
+{{ forms.lightswitchField({
+    label:        'Change Varnish Cache Clearing to BAN' | t,
+    id:           'varnishBan',
+    name:         'varnishBan',
+    instructions: 'Enable' | t,
+    errors:       settings.getErrors('varnishBan'),
+    on:        settings.varnishBan
+}) }}
+
+</div>
+            <div id="content-stats" class="tab-content">
+
+                <h2>Statics</h2>
+
+        {{ forms.textField({
+            label: "Total Cache Size (MB)",
+            value: settings.totalSize,
+            readOnly: true
+        }) }}
+
+        {{ forms.textField({
+            label: "Average Age of Cache Entries (min)",
+            value: settings.averageAge,
+            readOnly: true
+        }) }}                        
+
+        {{ forms.textField({
+            label: "Number of Cached Pages",
+            value: settings.numberCached,
+            readOnly: true
+        }) }}          
+            </div>
+    </div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+{# Write your JavaScript #}
+<script>
+$(document).ready(function() {
+    // Hide all tab content divs by default
+    $('.tab-content').hide();
+
+    // Show the first tab content div
+    $('.tab-content:first').show();
+
+    // When a tab is clicked
+    $('.scrollable a').click(function() {
+        // Get the ID of the tab
+        
+        var tabId = $(this).attr('id').replace('settings-tab-', '');
+        // Hide all tab content divs
+        $('.tab-content').hide();
+
+        // Show the clicked tab's content div and select current tab
+        $('#settings-content-' + tabId).show();
+        $('.sel').removeClass('sel');
+        $(this).addClass('sel');
+    });
+});
+</script>
+{% endblock %}

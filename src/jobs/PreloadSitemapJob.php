@@ -3,33 +3,28 @@
 namespace cooltronicpl\varnishcache\jobs;
 
 /**
- * Varnish Cache Helper plugin for Craft CMS 3.x & 4.x
+ * Varnish Cache with Preload (Preheat) to static HTML Helper plugin for Craft CMS 3.x & 4.x
  *
- * Varnish Cache Helper Plugin with http & htttps
+ * Varnish Cache with Preload (Preheat) to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 
 use cooltronicpl\varnishcache\services\VarnishCacheService;
 use cooltronicpl\varnishcache\VarnishCache;
 use cooltronicpl\varnishcache\jobs\QueueSingleton;
+use craft\helpers\Table;
 
 class PreloadSitemapJob extends \craft\queue\BaseJob
 {
 
     private $hasRun = false;
     
-    public function myInit()
-    {
-
-    }
-
     public function execute($queue): void
     {
         if (!$this->hasRun) {
-            $this->myInit();
 
             $this->hasRun = true;
             if (VarnishCache::getInstance()->getSettings()->resetQueue==true)
@@ -45,20 +40,32 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
             $v->preloadCacheFromSitemap();
             if (VarnishCache::getInstance()->getSettings()->cacheDuration) {
                 $duration = (VarnishCache::getInstance()->getSettings()->cacheDuration * 60 );
+                \Craft::info('After Varnish Execution loop: "' . $duration . '"');
+
             } else {
-                $duration = 60;
+                $duration = 3600;
             }
             if (VarnishCache::getInstance()->getSettings()->resetQueue==true)
             {
-                $nextTask = QueueSingleton::getInstance();
-                // Delete all tasks
-                $queue->releaseAll();
+                // Delete tasks with the IDs of the tasks with the description
+                $taskIds = (new \craft\db\Query())
+                    ->select(['id'])
+                    ->from('{{%queue}}')
+                    ->where(['description' => 'Preloading CRON active'])
+                    ->column();
+            
+                // Release (delete) the tasks
+                foreach ($taskIds as $taskId) {
+                    $queue->release($taskId);
+                }
             }
-            $this->hasRun = false;
             if (VarnishCache::getInstance()->getSettings()->resetQueue==true)
             {
-                $nextTask->push(new PreloadSitemapJob(), 1, $duration, 1800, $queue);
-                $now = \Craft::$app->formatter->asDatetime(time());
+                $job = new PreloadSitemapJob();
+                $this->hasRun = false;
+                $nextTask=QueueSingleton::getInstance();
+                $nextTask->push($job, 150, $duration, 1800);
+
                 \Craft::info('After Varnish Execution loop: "' . $now . '"');
             }
         }
@@ -66,7 +73,7 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
     
     protected function defaultDescription(): string
     {
-        return \Craft::t('app', 'Preloading CRON active');
+        return 'Preloading CRON active';
     }
 
     public function isRun(): bool{

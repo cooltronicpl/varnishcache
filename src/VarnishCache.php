@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Varnish Cache Helper plugin for Craft CMS 3.x
+ * Varnish Cache with Preload (Preheat) to static HTML Helper plugin for Craft CMS 3.x &
  *
- * Varnish Cache Helper Plugin with HTTP & HTTPS support
+ * Varnish Cache with Preload (Preheat) to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -12,7 +12,7 @@
 
 namespace cooltronicpl\varnishcache;
 
-use Craft;
+
 use craft\base\Plugin;
 use craft\web\Response;
 use craft\services\Plugins;
@@ -20,44 +20,113 @@ use craft\events\PluginEvent;
 use craft\services\Elements;
 use craft\helpers\FileHelper;
 use cooltronicpl\varnishcache\services\VarnishCacheService;
+use cooltronicpl\varnishcache\controllers\VarnishCacheController;
 use cooltronicpl\varnishcache\models\Settings;
+
 use yii\base\Event;
 use craft\elements\db\ElementQuery;
 use cooltronicpl\varnishcache\jobs\QueueSingleton;
+
+
 use cooltronicpl\varnishcache\records\VarnishCachesRecord;
 use cooltronicpl\varnishcache\records\VarnishCacheElementRecord;
 use cooltronicpl\varnishcache\variables\VarnishCacheClear;
+
 use craft\elements\User;
 use craft\elements\GlobalSet;
 use cooltronicpl\varnishcache\jobs\PreloadSitemapJob;
 use craft\web\twig\variables\CraftVariable;
 
+/**
+ * Craft plugins are very much like little applications in and of themselves. We’ve made
+ * it as simple as we can, but the training wheels are off. A little prior knowledge is
+ * going to be required to write a plugin.
+ *
+ * For the purposes of the plugin docs, we’re going to assume that you know PHP and SQL,
+ * as well as some semi-advanced concepts like object-oriented programming and PHP namespaces.
+ *
+ * https://craftcms.com/docs/plugins/introduction
+ *
+ * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
+ * @package   VarnishCache
+ * @since     1.0.0
+ *
+ */
 class VarnishCache extends Plugin
 {
+    // Static Properties
+    // =========================================================================
+
+    /**
+     * Static property that is an instance of this plugin class so that it can be accessed via
+     * VarnishCache::$plugin
+     *
+     * @var VarnishCache
+     */
     public static $plugin;
     public $schemaVersion = '1.0.0';
+    public $allowAnonymous = true;
     public $hasCpSettings = true;
+    public $job;
+    // Public Methods
+    // =========================================================================
 
-    protected function createSettingsModel(): Settings
+    public function hasCpSection()
     {
-        return new Settings();
+        return false;
     }
 
+    public function hasSettings()
+    {
+        return true;
+    }
+
+    /**
+     * @return Settings
+     */
+    protected function createSettingsModel(): Settings
+    {
+           return new Settings();
+    }
+
+    /**
+     * @return string
+     * @throws \yii\base\Exception
+     * @throws \Twig_Error_Loader
+     * @throws \RuntimeException
+     */
     protected function settingsHtml(): string
     {
-        return Craft::$app->getView()->renderTemplate(
+        // Get the settings model
+        $settings = $this->getSettings();
+
+        // Get the cache analytics data
+        $cacheAnalytics = $this->VarnishCacheService->getCacheAnalytics();
+
+        // Set the averageAge and totalSize properties of the settings model
+        $settings->averageAge = $cacheAnalytics['averageAge'];
+        $settings->totalSize = $cacheAnalytics['totalSize'];
+        $settings->numberCached = $cacheAnalytics['numberCached'];
+
+        return \Craft::$app->getView()->renderTemplate(
             'varnishcache/_settings',
             [
-                'settings' => $this->getSettings(),
+                'settings' => $settings,
             ]
         );
     }
 
+    /**
+     * Init plugin and initiate events
+     */
     public function init()
     {
         self::$plugin = $this;
+        // Register the VarnishCacheController
 
-
+        $this->controllerMap = [
+            'varnish-cache' => VarnishCacheController::class,
+        ];
         // ignore console requests
         if ($this->isInstalled && !\Craft::$app->request->getIsConsoleRequest()) {
             $this->setComponents(
@@ -89,6 +158,7 @@ class VarnishCache extends Plugin
                         $uri = \Craft::$app->request->getParam('p', '');
                         $siteId = \Craft::$app->getSites()->getCurrentSite()->id;
                         $elementId = $event->element->id;
+                        $uid = $event->element->uid;
 
                         // check if cache entry already exits otherwise create it
                         $cacheEntry = VarnishCachesRecord::findOne(['uri' => $uri, 'siteId' => $siteId]);
@@ -97,14 +167,16 @@ class VarnishCache extends Plugin
                             $cacheEntry->id = null;
                             $cacheEntry->uri = $uri;
                             $cacheEntry->siteId = $siteId;
+                            $cacheEntry->createdAt = date('Y-m-d H:i:s');
                             $cacheEntry->save();
                         }
-                        // check if relation element is already added or create it
-                        $cacheElement = VarnishCacheElementRecord::findOne(['elementId' => $elementId, 'cacheId' => $cacheEntry->id]);
+                         // check if relation element is already added or create it
+                         $cacheElement = VarnishCacheElementRecord::findOne(['elementId' => $elementId, 'cacheId' => $cacheEntry->id]);
                         if (!$cacheElement) {
                             $cacheElement = new VarnishCacheElementRecord();
                             $cacheElement->elementId = $elementId;
                             $cacheElement->cacheId = $cacheEntry->id;
+                            $cacheElement->createdAt = date('Y-m-d H:i:s');
                             $cacheElement->save();
                         }
                     }
@@ -182,7 +254,7 @@ class VarnishCache extends Plugin
 
                         $job = new PreloadSitemapJob();
                         if($job->isRun()==false){
-                            QueueSingleton::getInstance($job)->push($job, 1, 0, 1800);
+                            QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
 
                         }
                     }
