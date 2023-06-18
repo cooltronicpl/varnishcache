@@ -2,9 +2,9 @@
 namespace cooltronicpl\varnishcache\jobs;
 
 /**
- * Varnish Cache with Preload (Preheat) to static HTML Helper plugin for Craft CMS 3.x & 4.x
+ * Varnish Cache & Preload to static HTML plugin for Craft CMS 3.x & 4.x
  *
- * Varnish Cache with Preload (Preheat) to static HTML Helper Plugin with http & htttps
+ * Varnish Cache & Preload to static HTML Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -12,7 +12,7 @@ namespace cooltronicpl\varnishcache\jobs;
  */
 use craft\helpers\Queue;
 
-class QueueSingleton 
+class QueueSingleton
 {
     private static $instance;
 
@@ -27,6 +27,5 @@ class QueueSingleton
         }
         return self::$instance;
     }
-
 
 }

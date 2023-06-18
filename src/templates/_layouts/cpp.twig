@@ -1,16 +1,16 @@
 {# The control panel only supports queue components that implement QueueInterface #}
 {% set queue = craft.app.queue %}
 {% js %}
-    {% if queue is instance of("craft\\queue\\QueueInterface") %}
-        Craft.cp.setJobInfo({{ queue.getJobInfo(100)|json_encode|raw }}, false);
-        {% if queue.getHasReservedJobs() %}
-            Craft.cp.trackJobProgress(true);
-        {% elseif queue.getHasWaitingJobs() %}
-            Craft.cp.runQueue();
-        {% endif %}
-    {% else %}
-        Craft.cp.enableQueue = false;
-    {% endif %}
+{% if queue is instance of("craft\\queue\\QueueInterface") %}
+	Craft.cp.setJobInfo({{ queue.getJobInfo(100)|json_encode|raw }}, false);
+	{% if queue.getHasReservedJobs() %}
+		Craft.cp.trackJobProgress(true);
+	{% elseif queue.getHasWaitingJobs() %}
+		Craft.cp.runQueue();
+	{% endif %}
+{% else %}
+	Craft.cp.enableQueue = false;
+{% endif %}
 {% endjs %}
 
 {% set hasSystemIcon = CraftEdition == CraftPro and craft.rebrand.isIconUploaded %}
@@ -40,10 +40,10 @@
 {% set bodyClass = (bodyClass ?? [])|explodeClass %}
 {% set showHeader = showHeader ?? true %}
 {% if not showHeader %}
-    {% set bodyClass = bodyClass|push('no-header') -%}
+	{% set bodyClass = bodyClass|push('no-header') -%}
 {% endif %}
 {% if craft.app.hasModule('debug') %}
-    {% set bodyClass = bodyClass|push('has-debug-toolbar') %}
+	{% set bodyClass = bodyClass|push('has-debug-toolbar') %}
 {% endif %}
 
 {% set mainAttributes = {
@@ -73,81 +73,82 @@
 
 
 {% js at head %}
-    // Remove the hash so the browser doesn't scroll to it
+// Remove the hash so the browser doesn't scroll to it
     window.LOCATION_HASH = document.location.hash ? decodeURIComponent(document.location.hash.substr(1)) : null;
     history.replaceState(undefined, undefined, window.location.href.match(/^[^#]*/)[0]);
 {% endjs %}
 
 {% block body %}
-    {{ tag ('a', {
+	{{ tag ('a', {
         id: 'global-skip-link',
         text: 'Skip to content'|t('app'),
         href: '#main',
         class: 'skip-link btn',
     }) }}
 
-    <div id="global-container">
+	<div id="global-container">
 
-        <div id="page-container">
-            {% include '_layouts/components/alerts' %}
+		<div id="page-container">
+			{% include '_layouts/components/alerts' %}
 
 
-            <div id="main-container">
-                <main {{ attr(mainAttributes) }}>
+			<div id="main-container">
+				<main {{ attr(mainAttributes) }}>
 
-                    <div id="main-content" class="{{ mainContentClasses|join(' ') }}">
-     
+					<div
+						id="main-content" class="{{ mainContentClasses|join(' ') }}">
 
-                        {# content-container #}
-                        <div id="content-container">
 
-                            {% block main %}
-                                <div id="content" class="content-pane">
-                                    {% if contentNotice or tabs %}
-                                        <header id="content-header" class="pane-header">
-                                            {{ contentNotice ? tag('div', {
+						{# content-container #}
+						<div id="content-container">
+
+							{% block main %}
+								<div id="content" class="content-pane">
+									{% if contentNotice or tabs %}
+										<header id="content-header" class="pane-header">
+											{{ contentNotice ? tag('div', {
                                                 id: 'content-notice',
                                                 html: contentNotice,
                                                 role: 'status',
                                             }) }}
-                                            {% if tabs %}
-                                                {% include "_includes/tabs" with {
+											{% if tabs %}
+												{% include "_includes/tabs" with {
                                                     containerAttributes: {
                                                         id: 'tabs',
                                                     },
                                                 } %}
-                                            {% endif %}
-                                        </header>
-                                    {% endif %}
+											{% endif %}
+										</header>
+									{% endif %}
 
-                                    {% block content %}
-                                        {{ content is defined ? content|raw }}
-                                    {% endblock %}
-                                </div>
-                            {% endblock %}
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-    </div>
-    {% include '_layouts/components/notifications' %}
+									{% block content %}
+										{{ content is defined ? content|raw }}
+									{% endblock %}
+								</div>
+							{% endblock %}
+						</div>
+					</div>
+				</main>
+			</div>
+		</div>
+	</div>
+	{% include '_layouts/components/notifications' %}
 {% endblock %}
 
 
 {% block actionButton %}
-    {% if fullPageForm %}
-        <div class="btngroup">
-            {% block submitButton %}
-                <button type="submit" class="btn submit">{{ submitButtonLabel ?? 'Save'|t('app') }}</button>
-            {% endblock %}
-        </div>
-    {% endif %}
+	{% if fullPageForm %}
+		<div class="btngroup">
+			{% block submitButton %}
+				<button type="submit" class="btn submit">{{ submitButtonLabel ?? 'Save'|t('app') }}</button>
+			{% endblock %}
+		</div>
+	{% endif %}
 {% endblock %}
 
 
 {% if currentUser.can('performUpdates') and not craft.app.updates.getIsUpdateInfoCached() %}
-    {% js %}
-        Craft.cp.checkForUpdates();
-    {% endjs %}
+	{% js %}
+	Craft.cp.checkForUpdates();
+	{% endjs %}
 {% endif %}
