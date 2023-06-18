@@ -2,7 +2,7 @@
     "name": "cooltronicpl/varnishcache",
     "description": "The Varnish Cache plugin for Craft CMS is an advanced tool that enhances your website's performance by generating static HTML files and optional purging the Varnish cache.",
     "type": "craft-plugin",
-    "version": "2.3.0",
+    "version": "2.2.2",
     "keywords": [
         "craft",
         "cms",
