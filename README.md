@@ -44,7 +44,7 @@ You can also install the plugin directly from the [Craft CMS plugin store](https
 
 ## Usage
 
-This section provides detailed instructions and examples on how to use the Varnish Cache & Preload to static HTML Plugin.
+This section provides detailed instructions and examples on how to use the Varnish Cache & Preload to static HTML Helper Plugin.
 
 ### Preloading Server Cache from Sitemap
 
@@ -113,7 +113,7 @@ If you encounter any issues or have questions about the plugin, please create an
 
 ## Contribution
 
-We welcome contributions to the Varnish Cache & Preload to static HTML plugin. Please read our contribution guidelines and submit your pull requests.
+We welcome contributions to the Varnish Cache & Preload to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
 
 ## License
 

@@ -1,8 +1,8 @@
 <?php
 /**
- * Varnish Cache & Preload to static HTML plugin for Craft CMS 3.x & 4.x
+ * Varnish Cache & Preload to static HTML Helper plugin for Craft CMS 3.x & 4.x
  *
- * Varnish Cache & Preload to static HTML Plugin Preloading function
+ * Varnish Cache & Preload to static HTML Helper Plugin Preloading function
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.

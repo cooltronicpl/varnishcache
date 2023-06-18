@@ -1,4 +1,8 @@
-# Varnish Cache & Preload to HTML Changelog
+# Varnish Cache & Preload to static HTML Changelog
+
+## 2.2.3 - 2023-06-18
+
+- **Enhancement**: Merged repository with 3.x branch from tag 1.1.2.
 
 ## 2.2.2 - 2023-06-18
 
@@ -56,7 +60,6 @@
 
 - **Bugfix**: Modified the cURL mechanism to prevent the display of Varnish purge information.
 - **Bugfix**: Fixed an issue within the Varnish cache clearing function.
-- This version is equivalent to version 2.2.1 from the Craft CMS 4.x branch.
 
 ## 1.1.0 - 2023-06-17
 
@@ -72,5 +75,5 @@
 
 ## 1.0.0 - 2023-06-14
 
-- Initial release of Varnish Cache & Preload to static HTML for Craft CMS 3.x.
+- Initial release of Varnish Cache & Preload to static HTML Helper for Craft CMS 3.x.
 - This version is equivalent to version 2.1.0 from the Craft CMS 4.x branch.
