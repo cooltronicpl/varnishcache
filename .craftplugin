@@ -1,1 +1,26 @@
-{"pluginName":"Varnish Cache with Preload to HTML","pluginDescription":"Varnish Cache with Preload to HTML","pluginVersion":"1.1.1","pluginAuthorName":"CoolTRONIC.pl sp. z o.o. (LLC)","pluginVendorName":"cooltronicpl","pluginAuthorUrl":"http://cooltronic.pl/","pluginAuthorGithub":"cooltronicpl","codeComments":"yes","pluginComponents":["controllers"],"consolecommandName":"","controllerName":"","cpsectionName":"","elementName":"","fieldName":"","modelName":"","purchasableName":"","recordName":"","serviceName":"","taskName":"","utilityName":"","widgetName":"","apiVersion":"api_version_3_0"}
+{
+    "pluginName": "Varnish Cache & Preload to HTML",
+    "pluginDescription": "The Varnish Cache plugin for Craft CMS is an advanced tool that enhances your website's performance by generating static HTML files and optional purging the Varnish cache.",
+    "pluginVersion": "1.1.2",
+    "pluginAuthorName": "CoolTRONIC.pl sp. z o.o. (LLC)",
+    "pluginVendorName": "cooltronicpl",
+    "pluginAuthorUrl": "http://cooltronic.pl/",
+    "pluginAuthorGithub": "cooltronicpl",
+    "codeComments": "yes",
+    "pluginComponents": [
+        "controllers"
+    ],
+    "consolecommandName": "",
+    "controllerName": "",
+    "cpsectionName": "",
+    "elementName": "",
+    "fieldName": "",
+    "modelName": "",
+    "purchasableName": "",
+    "recordName": "",
+    "serviceName": "",
+    "taskName": "",
+    "utilityName": "",
+    "widgetName": "",
+    "apiVersion": "api_version_3_0"
+}

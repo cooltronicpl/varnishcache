@@ -1,8 +1,8 @@
 <?php
 /**
- * Varnish Cache with Preload (Preheat) to static HTML Helper plugin for Craft CMS 3.x & 4.x
+ * Varnish Cache & Preload to static HTML Helper plugin for Craft CMS 3.x & 4.x
  *
- * Varnish Cache with Preload (Preheat) to static HTML Helper Plugin with http & htttps
+ * Varnish Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -42,7 +42,9 @@ class Install extends Migration
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'createdAt' => $this->dateTime()->notNull(),
-            'cacheSize' =>  $this->integer(),
+            'cacheSize' =>  $this->float(),
+            'preloadTime' => $this->float(),
+            'firstLoadTime' => $this->float(),
             'uid' => $this->uid()
         ];
         $this->createTable('{{%varnishcache_caches}}', $columns);

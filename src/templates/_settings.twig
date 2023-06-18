@@ -1,233 +1,284 @@
 {% extends "varnishcache/_layouts/cpp.twig" %}
 
 {% import "_includes/forms" as forms %}
-{% set title = 'Varnish Cache with Preload (Preheat) to static HTML' %}
+{% set title = 'Varnish Cache & Preload to static HTML' %}
 
 {% set selectedTab = 'general' %}
 
-{% set title = 'Varnish Cache with Preload (Preheat) to static HTML Helper and HTML Cache Generator' %}
-
 {% set tabs = {
     general: {label: 'General'|t, url: '#general'},
-        preload: {label: 'Preload (Preheat)'|t, url: '#preload'},
-
+    preload: {label: 'Preload'|t, url: '#preload'},
     cron: {label: 'CRON'|t, url: '#cron'},
     varnish: {label: 'Varnish'|t, url: '#varnish'},
-
-    stats: {label: 'Statistics'|t, url: '#stats'}
+    stats: {label: 'Stats'|t, url: '#stats'}
 } %}
 {% block content %}
 
-<div class="tab-contents">
-            <div id="content-general" class="tab-content">
+	<div class="tab-contents">
 
+		<div id="content-general" class="tab-content">
+			<h2>
+				Welcome!
+			</h2>
+			<p>Welcome to the comprehensive guide on the Varnish Cache Plugin Settings. This guide will walk you through the various settings for enabling and configuring the cache, as well as providing statistics about the cache's performance.
+			</p>
 
- <h2>General Settings</h2>
+			<h2>General Settings</h2>
 
-        
-{{ forms.lightswitchField({
-    label:        "Enable Varnish Cache Plugin?" | t,
-    id:           'enableGeneral',
-    name:         'enableGeneral',
-    instructions: "If the Varnish Cache is not enabled, it will not serve cached files" | t,
-    errors:       settings.getErrors('enableGeneral'),
-    on:           settings.enableGeneral
+			<p>The general settings section is the first step in configuring your Varnish Cache Plugin. Here, you can enable the plugin, force it to be always on, and even optimize the cached content by removing whitespaces. You can also set the default cache expiration time, which is the amount of minutes a cached request is valid. If you wish, you can purge all current cached files instantly.</p>
+
+			{{ forms.lightswitchField({
+    label: "Enable Plugin?" | t,
+    id: 'enableGeneral',
+    name: 'enableGeneral',
+    instructions: "Enable Varnish Cache to serve cached files" | t,
+    errors: settings.getErrors('enableGeneral'),
+    on: settings.enableGeneral
 }) }}
 
-{{ forms.lightswitchField({
-    label:        "Force on" | t,
-    id:           'forceOn',
-    name:         'forceOn',
-    instructions: "Forces Varnish Cache to be always on" | t,
-    errors:       settings.getErrors('forceOn'),
-    on:        settings.forceOn
-
+			{{ forms.lightswitchField({
+    label: "Always On" | t,
+    id: 'forceOn',
+    name: 'forceOn',
+    instructions: "Keep Varnish Cache always on" | t,
+    errors: settings.getErrors('forceOn'),
+    on: settings.forceOn
 }) }}
 
-{{ forms.lightswitchField({
-    label:        "Optimize Cached Content" | t,
-    id:           'optimizeContent',
-    name:         'optimizeContent',
-    instructions: "Tries to optimize content by removing whitespaces" | t,
-    errors:       settings.getErrors('optimizeContent'),
-    on:        settings.optimizeContent
+			{{ forms.lightswitchField({
+    label: "Optimize Content" | t,
+    id: 'optimizeContent',
+    name: 'optimizeContent',
+    instructions: "Optimize content by removing whitespaces" | t,
+    errors: settings.getErrors('optimizeContent'),
+    on: settings.optimizeContent
 }) }}
 
-{{ forms.textField({
-    label:        "Default Cache Expiration time" | t,
-    id:           'cacheDuration',
-    name:         'cacheDuration',
-    instructions: "Amount of minutes a Cached Request is valid, and if Preload is active interval peroid between preloads"|t,
-    value:        settings.cacheDuration,
-    errors:       settings.getErrors('cacheDuration')
+			{{ forms.textField({
+    label: "Cache Expiration (minutes)" | t,
+    id: 'cacheDuration',
+    name: 'cacheDuration',
+    instructions: "Set cache validity and preload interval"|t,
+    value: settings.cacheDuration,
+    errors: settings.getErrors('cacheDuration')
 }) }}
 
-{{ forms.lightswitchField({
-    label:        "Purge all Cache now?" | t,
-    id:           'purgeCache',
-    name:         'purgeCache',
-    instructions: "Purge all current cached files (with Varnish Clear from of Sitemaps if Enabled)" | t,
+			{{ forms.lightswitchField({
+    label: "Purge Cache Now?" | t,
+    id: 'purgeCache',
+    name: 'purgeCache',
+    instructions: "Purge all current cached files" | t,
 }) }}
 
-{% set siteOptions = [{
-    label: 'All sites' | t,
-    value: '-1',
-}] %}
-{% for site in craft.app.sites.allSites() %}
-    {% set siteOptions = siteOptions | merge([{
-        label: site.name ~ ' (' ~ site.language ~ ')',
-        value: site.id,
-    }]) %}
-{% endfor %}
-</div>
-            <div id="content-preload" class="tab-content">
-
-{{ forms.lightswitchField({
-    label:        "Enable preload from sitmemap in xml format?" | t,
-    id:           'preloadSitemap',
-    name:         'preloadSitemap',
-    instructions: "Enable " | t,
-    errors:       settings.getErrors('preloadSitemap'),
-    on:        settings.preloadSitemap
+		</div>
+		<div id="content-preload" class="tab-content">
+			<h2>
+				Preloading / Preheat / Warmup
+			</h2>
+			<p>
+				In the preload settings, you can enable preload from a sitemap in XML format. You can also specify the sitemap relative paths array for preload after cache expires. Paths to be excluded from being cached can also be defined here. You can enter regular expressions as well as precise URL paths.
+			</p>
+			{{ forms.lightswitchField({
+    label: "Preload from Sitemap?" | t,
+    id: 'preloadSitemap',
+    name: 'preloadSitemap',
+    instructions: "Enable preloading from sitemap" | t,
+    errors: settings.getErrors('preloadSitemap'),
+    on: settings.preloadSitemap
 }) }}
 
-{{ forms.editableTableField({
-    label:        "Sitemap relaive paths array for preload after cache expire" | t,
-    id:           'sitemap',
-    name:         'sitemap',
-    instructions: "Path of sitemap to preload with a precise relative path like: 'sitemap.xml' "|t,
-    cols:           [
+			{{ forms.editableTableField({
+    label: "Sitemap Paths for Preload" | t,
+    id: 'sitemap',
+    name: 'sitemap',
+    instructions: "Enter sitemap paths for preload"|t,
+    cols: [
                         {
                             heading: 'Sitemaps XML paths' | t,
-                            info: 'Enter a precise URL of sitemap without the <span class="code">siteURL</span> part as they are returned by <span class="code">\Craft::$app->request->getFullPath()</span>, like "sitemap_index.xml" insteadof "https://example.com/sitemap_index.xml".' | t,
+                            info: 'Enter URL of sitemap without siteURL part' | t,
                             type: 'text',
                             placeholder: 'sitemap.xml',
                         },
                     ],
-    rows:           settings.sitemap,
-    errors:         settings.getErrors('sitemap'),
+    rows: settings.sitemap,
+    errors: settings.getErrors('sitemap'),
     minRows: 0,
 	allowAdd: true,
     allowReorder: true,
     allowDelete: true
 }) }}
-
-{{ forms.editableTableField({
-    label:          'Excluded paths' | t,
-    instructions:   'Paths to be excluded from being cached, you can enter regular expressions "/page/.*" as well as precise URL paths like: "/page/to/be/excluded".' | t,
-    name:           'excludedUrlPaths',
-    id:             'excludedUrlPaths',
-    cols:           [
+			{% set siteOptions = [{
+    label: 'All sites' | t,
+    value: '-1',
+}] %}
+			{% for site in craft.app.sites.allSites() %}
+				{% set siteOptions = siteOptions | merge([{
+        label: site.name ~ ' (' ~ site.language ~ ')',
+        value: site.id,
+    }]) %}
+			{% endfor %}
+			{{ forms.editableTableField({
+    label: 'Excluded Paths' | t,
+    instructions: 'Exclude certain paths from being cached' | t,
+    name: 'excludedUrlPaths',
+    id: 'excludedUrlPaths',
+    cols: [
                         {
-                            heading: 'Excluded precise relative paths' | t,
-                            info: 'Enter a precise URL paths or regular expressions without the <span class="code">siteURL</span> part as they are returned by <span class="code">\Craft::$app->request->getFullPath()</span>, like "/any/page" insteadof "https://example.com/site-specific/path/any/page".' | t,
+                            heading: 'Excluded Paths' | t,
+                            info: 'Enter precise URL paths or regular expressions without siteURL part' | t,
                             type: 'singleline',
                             placeholder: '/path/to/excluded/page OR regex like /path/.*/excluded/.*',
                         },
                         {
                             heading: 'Multi-site' | t,
-                            info: 'Choose either if the configured path shall always be excluded from caches regardless of which multi-site is requested or if the exclusion of given path is dependant on the requested site.' | t,
+                            info: 'Choose if the configured path shall always be excluded from caches regardless of which multi-site is requested or if the exclusion of given path is dependant on the requested site.' | t,
                             type: 'select',
                             options: siteOptions,
                         },
                     ],
-    rows:           settings.excludedUrlPaths,
-    errors:         settings.getErrors('excludedUrlPaths'),
+    rows: settings.excludedUrlPaths,
+    errors: settings.getErrors('excludedUrlPaths'),
     minRows: 0,
 	allowAdd: true,
     allowReorder: true,
     allowDelete: true
 }) }}
-</div>
-            <div id="content-cron" class="tab-content">
-        {{ forms.textField({
-    label:        "Default Cache Expiration time" | t,
-    id:           'interval',
-    name:         'interval',
-    instructions: "Amount of seconds between Preload request (when Preloads fails make bigger value)"|t,
-    value:        settings.interval,
+		</div>
+		<div id="content-cron" class="tab-content">
+			<h2>CRON Job of Preloading</h2>
+			<p>In the cron settings, you can set the default cache interval in seconds, which is the amount of seconds between preload requests. You can also enable global queue resetting and run all preload operations without interval.
+			</p>
+			{{ forms.textField({
+    label: "Cache Interval (seconds)" | t,
+    id: 'interval',
+    name: 'interval',
+    instructions: "Set interval between Preload requests"|t,
+    value: settings.interval,
     min: 2,
     max: 99,
-    errors:       settings.getErrors('interval')
+    errors: settings.getErrors('interval')
 }) }}
-{{ forms.lightswitchField({
-    label:        'Enable Global Queue Resseting (make CRON job to make preload of XML file)' | t,
-    id:           'resetQueue',
-    name:         'resetQueue',
+			{{ forms.lightswitchField({
+    label: 'Enable Global Queue Resetting' | t,
+    id: 'resetQueue',
+    name: 'resetQueue',
+    instructions: 'Enable to make CRON job to preload XML file' | t,
+    errors: settings.getErrors('resetQueue'),
+    on: settings.resetQueue
+}) }}
+			{{ forms.lightswitchField({
+    label: 'Run All Preload Operations Without Interval' | t,
+    id: 'runAll',
+    name: 'runAll',
+    instructions: 'Enable to disable Cache interval and preload all sitemap without any delays, that may require heavy server and use more resources' | t,
+    errors: settings.getErrors('resetQueue'),
+    on: settings.resetQueue
+}) }}
+		</div>
+
+		<div id="content-varnish" class="tab-content">
+			<h2>Varnish Settings</h2>
+			<p>
+				In the varnish settings, you can enable default Varnish Cache Clearing via PURGE or change it to BAN.
+			</p>
+			{{ forms.lightswitchField({
+    label: 'Enable Default Varnish Cache Clearing via PURGE' | t,
+    id: 'enableVarnish',
+    name: 'enableVarnish',
     instructions: 'Enable' | t,
-    errors:       settings.getErrors('resetQueue'),
-    on:        settings.resetQueue
+    errors: settings.getErrors('enableVarnish'),
+    on: settings.enableVarnish
 }) }}
-</div>
 
-            <div id="content-varnish" class="tab-content">
-
-{{ forms.lightswitchField({
-    label:        'Enable default Varnish Cache Clearing via PURGE' | t,
-    id:           'enableVarnish',
-    name:         'enableVarnish',
+			{{ forms.lightswitchField({
+    label: 'Change Varnish Cache Clearing to BAN' | t,
+    id: 'varnishBan',
+    name: 'varnishBan',
     instructions: 'Enable' | t,
-    errors:       settings.getErrors('enableVarnish'),
-    on:        settings.enableVarnish
+    errors: settings.getErrors('varnishBan'),
+    on: settings.varnishBan
 }) }}
+		</div>
+		<div id="content-stats" class="tab-content">
 
-{{ forms.lightswitchField({
-    label:        'Change Varnish Cache Clearing to BAN' | t,
-    id:           'varnishBan',
-    name:         'varnishBan',
-    instructions: 'Enable' | t,
-    errors:       settings.getErrors('varnishBan'),
-    on:        settings.varnishBan
-}) }}
+			<h2>Statistics</h2>
+			<p>View insights into your cache's performance.</P>
 
-</div>
-            <div id="content-stats" class="tab-content">
+			<h3>Total Cache Size</h3>
+			<p>{{ settings.totalSize|round(3) }}
+				KB</p>
 
-                <h2>Statics</h2>
+			<h3>Average Age of Cache Entries</h3>
+			<p>{{ settings.averageAge|round(1) }}
+				minutes</p>
 
-        {{ forms.textField({
-            label: "Total Cache Size (MB)",
-            value: settings.totalSize,
-            readOnly: true
-        }) }}
+			<h3>Number of Cache Entries</h3>
+			<p>{{ settings.numberCached|round }}</p>
 
-        {{ forms.textField({
-            label: "Average Age of Cache Entries (min)",
-            value: settings.averageAge,
-            readOnly: true
-        }) }}                        
+			<h3>Average Preload Time</h3>
+			<p>{{ settings.preloadAverage|round(3) }}
+				seconds</p>
 
-        {{ forms.textField({
-            label: "Number of Cached Pages",
-            value: settings.numberCached,
-            readOnly: true
-        }) }}          
-            </div>
-    </div>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+			<h3>Average First Load</h3>
+			<p>{{ settings.firstLoadAverage|round(3) }}
+				seconds</p>
 
-{# Write your JavaScript #}
-<script>
-$(document).ready(function() {
-    // Hide all tab content divs by default
-    $('.tab-content').hide();
+			<h2>All Cached Entries Statistics</h2>
 
-    // Show the first tab content div
-    $('.tab-content:first').show();
+			<table>
+				<thead>
+					<tr>
+						<th>URI</th>
+						<th>Cache Size (KB)</th>
+						<th>Created At</th>
+						<th>Preload Time (s)</th>
+						<th>First Load Time (s)</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% if settings.cacheRecords is defined %}
+						{% for cacheRecord in settings.cacheRecords %}
+							<tr>
+								<td>{{ cacheRecord.uri }}</td>
+								<td>{{ cacheRecord.cacheSize / 1024|round(3) }}</td>
+								<td>{{ cacheRecord.createdAt|date('Y-m-d H:i:s') }}</td>
+								<td>{{ cacheRecord.preloadTime|round(3) }}</td>
+								<td>{{ cacheRecord.firstLoadTime|round(3) }}</td>
+							</tr>
+						{% endfor %}
+					{% else %}
+						<tr>
+							<td colspan="5">No cache records found.</td>
+						</tr>
+					{% endif %}
+				</tbody>
+			</table>
 
-    // When a tab is clicked
-    $('.scrollable a').click(function() {
-        // Get the ID of the tab
-        
-        var tabId = $(this).attr('id').replace('settings-tab-', '');
-        // Hide all tab content divs
-        $('.tab-content').hide();
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-        // Show the clicked tab's content div and select current tab
-        $('#settings-content-' + tabId).show();
-        $('.sel').removeClass('sel');
-        $(this).addClass('sel');
-    });
+	{# Write your JavaScript #}
+	<script>
+		$(document).ready(function () { // Hide all tab content divs by default
+$('.tab-content').hide();
+
+// Show the first tab content div
+$('.tab-content:first').show();
+
+// When a tab is clicked
+$('.scrollable a').click(function () { // Get the ID of the tab
+
+var tabId = $(this).attr('id').replace('settings-tab-', '');
+// Hide all tab content divs
+$('.tab-content').hide();
+
+// Show the clicked tab's content div and select current tab
+$('#settings-content-' + tabId).show();
+$('.sel').removeClass('sel');
+$(this).addClass('sel');
 });
-</script>
+});
+	</script>
 {% endblock %}
+

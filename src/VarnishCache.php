@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Varnish Cache with Preload (Preheat) to static HTML Helper plugin for Craft CMS 3.x &
+ * Varnish Cache & Preload to static HTML Helper plugin for Craft CMS 3.x &
  *
- * Varnish Cache with Preload (Preheat) to static HTML Helper Plugin with http & htttps
+ * Varnish Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -12,30 +12,25 @@
 
 namespace cooltronicpl\varnishcache;
 
-
-use craft\base\Plugin;
-use craft\web\Response;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
-use craft\services\Elements;
-use craft\helpers\FileHelper;
-use cooltronicpl\varnishcache\services\VarnishCacheService;
 use cooltronicpl\varnishcache\controllers\VarnishCacheController;
-use cooltronicpl\varnishcache\models\Settings;
-
-use yii\base\Event;
-use craft\elements\db\ElementQuery;
-use cooltronicpl\varnishcache\jobs\QueueSingleton;
-
-
-use cooltronicpl\varnishcache\records\VarnishCachesRecord;
-use cooltronicpl\varnishcache\records\VarnishCacheElementRecord;
-use cooltronicpl\varnishcache\variables\VarnishCacheClear;
-
-use craft\elements\User;
-use craft\elements\GlobalSet;
 use cooltronicpl\varnishcache\jobs\PreloadSitemapJob;
+use cooltronicpl\varnishcache\jobs\QueueSingleton;
+use cooltronicpl\varnishcache\models\Settings;
+use cooltronicpl\varnishcache\records\VarnishCacheElementRecord;
+use cooltronicpl\varnishcache\records\VarnishCachesRecord;
+use cooltronicpl\varnishcache\services\VarnishCacheService;
+use cooltronicpl\varnishcache\variables\VarnishCacheClear;
+use craft\base\Plugin;
+use craft\elements\db\ElementQuery;
+use craft\elements\GlobalSet;
+use craft\elements\User;
+use craft\events\PluginEvent;
+use craft\helpers\FileHelper;
+use craft\services\Elements;
+use craft\services\Plugins;
+use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
+use yii\base\Event;
 
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
@@ -86,7 +81,7 @@ class VarnishCache extends Plugin
      */
     protected function createSettingsModel(): Settings
     {
-           return new Settings();
+        return new Settings();
     }
 
     /**
@@ -103,10 +98,13 @@ class VarnishCache extends Plugin
         // Get the cache analytics data
         $cacheAnalytics = $this->VarnishCacheService->getCacheAnalytics();
 
-        // Set the averageAge and totalSize properties of the settings model
+        // Set the statistics data into settings
         $settings->averageAge = $cacheAnalytics['averageAge'];
         $settings->totalSize = $cacheAnalytics['totalSize'];
         $settings->numberCached = $cacheAnalytics['numberCached'];
+        $settings->preloadAverage = $cacheAnalytics['preloadAverage'];
+        $settings->firstLoadAverage = $cacheAnalytics['firstLoadAverage'];
+        $settings->cacheRecords = $cacheAnalytics['cacheRecords'];
 
         return \Craft::$app->getView()->renderTemplate(
             'varnishcache/_settings',
@@ -140,13 +138,13 @@ class VarnishCache extends Plugin
             // after request send try and create the cache file
             Event::on(Response::class, Response::EVENT_AFTER_SEND, function (Event $event) {
                 $this->VarnishCacheService->createCacheFile();
-                
+
             });
 
             // on every update of an element clear the caches related to the element
             Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT, function (Event $event) {
                 $this->VarnishCacheService->clearCacheFile($event->element->id);
-                
+
             });
 
             // on populated element put to relation table
@@ -170,8 +168,8 @@ class VarnishCache extends Plugin
                             $cacheEntry->createdAt = date('Y-m-d H:i:s');
                             $cacheEntry->save();
                         }
-                         // check if relation element is already added or create it
-                         $cacheElement = VarnishCacheElementRecord::findOne(['elementId' => $elementId, 'cacheId' => $cacheEntry->id]);
+                        // check if relation element is already added or create it
+                        $cacheElement = VarnishCacheElementRecord::findOne(['elementId' => $elementId, 'cacheId' => $cacheEntry->id]);
                         if (!$cacheElement) {
                             $cacheElement = new VarnishCacheElementRecord();
                             $cacheElement->elementId = $elementId;
@@ -181,7 +179,7 @@ class VarnishCache extends Plugin
                         }
                     }
                 }
-                
+
             });
 
             // always reset purge cache value
@@ -211,7 +209,7 @@ class VarnishCache extends Plugin
                         'as log' => \yii\queue\LogBehavior::class,
                     ]);
                 }
-                
+
             }
 
         );
@@ -253,7 +251,7 @@ class VarnishCache extends Plugin
                     if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
 
                         $job = new PreloadSitemapJob();
-                        if($job->isRun()==false){
+                        if ($job->isRun() == false) {
                             QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
 
                         }

@@ -1,9 +1,8 @@
-
-# Varnish Cache with Preload (Preheat) to static HTML Plugin for Craft CMS
+# Varnish Cache & Preload to HTML Plugin for Craft CMS
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
 
-![Varnish Cache with Preload (Preheat) to static HTML Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
+![Varnish Cache & Preload to HTML Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
 
 ## Table of Contents
 
@@ -40,11 +39,12 @@ To install this plugin, copy the following command to your terminal:
 ```
 composer require cooltronicpl/varnishcache
 ```
+
 You can also install the plugin directly from the [Craft CMS plugin store](https://plugins.craftcms.com/varnishcache/).
 
 ## Usage
 
-This section provides detailed instructions and examples on how to use the Varnish Cache with Preload (Preheat) to static HTML Helper Plugin.
+This section provides detailed instructions and examples on how to use the Varnish Cache & Preload to static HTML Helper Plugin.
 
 ### Preloading Server Cache from Sitemap
 
@@ -70,6 +70,7 @@ To disable Varnish Cache for a specific page, you can disable this slug in the a
 To clear a specific URL with Varnish and some linked HTML files, this is executed by the Craft Job Queue with a delay that you specify as the last argument in the `clearCustomUrlUriTimeout` function.
 
 Example:
+
 ```
 {{ craft.varnish.clearCustomUrlUriTimeout("test", "https://domain.com/test/",10) }}
 ```
@@ -79,15 +80,19 @@ This command will clear the cache for the URL https://domain.com/test/ after a d
 ## FAQ
 
 ### Q: Are all cache files deleted when updating an entry, or only the ones with a relation?
+
 A: Only related cache files will be deleted and sites preloaded via Varnish after an update.
 
-### Q: The installation fails and plugin does not work.   
+### Q: The installation fails and plugin does not work.
+
 A: Make sure that the folder `storage/runtime/varniscache` is created and there are read/write permissions.
 
 ### Q: How to set Varnish Server?
+
 A: You can use the vcl file from [our project](https://github.com/cooltronicpl/-ispconfig3-varnish/blob/master/etc/varnish/default.vcl) which contains a modified WordPress Purge mechanism for Craft CMS.
 
 ### Q: Which branch should I install for my Craft CMS?
+
 A: The 1.x branch is suitable for Craft CMS 3, whereas the 2.x branch is for Craft CMS 4.
 
 ### Q: My Preloading CRON failed. What could be the reason?
@@ -108,7 +113,7 @@ If you encounter any issues or have questions about the plugin, please create an
 
 ## Contribution
 
-We welcome contributions to the Varnish Cache with Preload (Preheat) to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
+We welcome contributions to the Varnish Cache & Preload to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
 
 ## License
 
