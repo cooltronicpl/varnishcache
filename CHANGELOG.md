@@ -51,7 +51,7 @@
 
 - Initial Varnish Cache & Preload to static HTML for Craft 4.x
 
-## 1.1.4 - 2023-06-18
+## 1.1.4 - 2023-06-21
 
 - **Enhancement**: ntroduced an event to automatically refresh the cache after a URI or Slug update.
 - **Feature**: Updated README with a new section answering a common question about cache clearing during a plugin update.
