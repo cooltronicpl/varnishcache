@@ -1,5 +1,10 @@
 # Varnish Cache & Preload to static HTML Changelog
 
+## 2.3.0 - 2023-06-21 [CRITICAL]
+
+- **Enhancement**: Implemented an event to trigger automatic cache refresh when entries are updated or undergo modifications.
+- **Fix**: Rectified an issue with incorrect class import for an event, ensuring the cache refreshes automatically after a URI or Slug update.
+
 ## 2.2.4 - 2023-06-21
 
 - **Enhancement**: Introduced an event to automatically refresh the cache after a URI or Slug update.
@@ -50,6 +55,12 @@
 ## 2.0.0 - 2022-12-23
 
 - Initial Varnish Cache & Preload to static HTML for Craft 4.x
+
+## 1.2.0 - 2023-06-21 [CRITICAL]
+
+- **Enhancement**: Implemented an event to trigger automatic cache refresh when entries are updated or undergo modifications.
+- **Fix**: Rectified an issue with incorrect class import for an event, ensuring the cache refreshes automatically after a URI or Slug update.
+
 
 ## 1.1.4 - 2023-06-21
 
