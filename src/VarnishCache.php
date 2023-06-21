@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Varnish Cache & Preload to static HTML Helper plugin for Craft CMS 3.x &
+ * Varnish Cache & Preload to static HTML Helper plugin for Craft CMS 3.x & 4.x
  *
  * Varnish Cache & Preload to static HTML Helper Plugin with http & htttps
  *
@@ -31,6 +31,8 @@ use craft\services\Plugins;
 use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
+use craft\elements\Entry;
+use craft\events\ElementEvent;
 
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
@@ -247,9 +249,7 @@ class VarnishCache extends Plugin
             Plugins::EVENT_AFTER_SAVE_PLUGIN_SETTINGS,
             function (PluginEvent $event) {
                 if ($event->plugin === $this) {
-
                     if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
-
                         $job = new PreloadSitemapJob();
                         if ($job->isRun() == false) {
                             QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
@@ -261,13 +261,41 @@ class VarnishCache extends Plugin
         );
 
         Event::on(
-            Plugins::class,
-            Plugins::EVENT_AFTER_UPDATE_SLUG_AND_URI,
-            function (PluginEvent $event) {
-                if ($event->plugin === $this) {
+            Elements::class,
+            Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
+            function (ElementEvent $event) {
+                if ($event->element === $this) {
+                    if (VarnishCache::getInstance()->getSettings()->purgeCache === '1') {
+                        $this->VarnishCacheService->clearCacheFiles();
+                    }
                     if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
+                        // If the event element is an Entry (a page)
+                        if ($event->element instanceof \craft\elements\Entry ) {
+                            // Create a new PreloadSitemapJob
+                            $job = new PreloadSitemapJob();
+                            // Push the job to the queue
+                            QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
+                        }
+                    }
+                }
+            }
+        );
+
+        Event::on(
+            Elements::class,
+            Elements::EVENT_AFTER_SAVE_ELEMENT,
+            function (ElementEvent $event) {
+                if ($event->element instanceof \craft\elements\Entry ) {
+                    // Check if the preloadSitemap setting of the VarnishCache instance is set to '1'
+                    if (VarnishCache::getInstance()->getSettings()->purgeCache === '1') {
+                        $this->VarnishCacheService->clearCacheFiles();
+                    }
+                    if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
+                        // If the event element is an Entry (a page)
+                        // Create a new PreloadSitemapJob
                         $job = new PreloadSitemapJob();
-                        QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);                      
+                        // Push the job to the queue
+                        QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
                     }
                 }
             }
