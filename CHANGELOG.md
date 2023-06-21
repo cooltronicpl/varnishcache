@@ -1,5 +1,11 @@
 # Varnish Cache & Preload to static HTML Changelog
 
+## 1.1.4 - 2023-06-21
+
+- **Enhancement**: ntroduced an event to automatically refresh the cache after a URI or Slug update.
+- **Feature**: Updated README with a new section answering a common question about cache clearing during a plugin update.
+- **Feature**: Modified the plugin icon in the README to PNG format for compatibility with both dark and light modes.
+
 ## 1.1.2 - 2023-06-18
 
 - **Enhancement**: Revamped Statistics Tab and improved descriptions for better readability in the plugin.

@@ -1,7 +1,7 @@
 {
     "pluginName": "Varnish Cache & Preload to HTML",
-    "pluginDescription": "The Varnish Cache plugin for Craft CMS is an advanced tool that enhances your website's performance by generating static HTML files and optional purging the Varnish cache.",
-    "pluginVersion": "1.1.2",
+    "pluginDescription": "The Varnish Cache & Preload Plugin is a revolutionary tool designed to optimize your website's performance with optional Varnish purge and preload your site into HTML files.",
+    "pluginVersion": "1.1.4",
     "pluginAuthorName": "CoolTRONIC.pl sp. z o.o. (LLC)",
     "pluginVendorName": "cooltronicpl",
     "pluginAuthorUrl": "http://cooltronic.pl/",
