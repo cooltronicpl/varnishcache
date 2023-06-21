@@ -2,7 +2,8 @@
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
 
-![Varnish Cache & Preload to HTML Logo](https://github.com/cooltronicpl/varnishcache/blob/master/src/icon.svg)
+![Icon](resources/black.png#gh-light-mode-only)
+![Icon](resources/white.png#gh-dark-mode-only)
 
 ## Table of Contents
 
@@ -21,6 +22,7 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching h
   - [Q: My Preloading CRON failed. What could be the reason?](#q-my-preloading-cron-failed-what-could-be-the-reason)
   - [Q: Some URL Preloading failed?](#q-some-url-preloading-failed)
   - [Q: How to reset Cache?](#q-how-to-reset-cache)
+  - [Q: What if the plugin's control panel settings don't match the screenshots?](#q-what-if-the-plugins-control-panel-settings-dont-match-the-screenshots)
 - [Support](#support)
 - [Contribution](#contribution)
 - [License](#license)
@@ -106,6 +108,9 @@ A: If some URL preloading is failing, you can try to increase the preload time i
 ### Q: How to reset Cache?
 
 A: To reset the cache, navigate to the settings and enable the **Purge all Cache now?** option. Don't forget to click "Save" to apply the changes.
+
+### Q: What if the plugin's control panel settings don't match the screenshots?
+A: You might need to clear the Craft CMS Cache. Navigate to the **Utilities** Tab, select **Caches**, and then click on **Clear cache**.
 
 ## Support
 

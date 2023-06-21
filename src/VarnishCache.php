@@ -247,9 +247,7 @@ class VarnishCache extends Plugin
             Plugins::EVENT_AFTER_SAVE_PLUGIN_SETTINGS,
             function (PluginEvent $event) {
                 if ($event->plugin === $this) {
-
                     if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
-
                         $job = new PreloadSitemapJob();
                         if ($job->isRun() == false) {
                             QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
@@ -259,6 +257,21 @@ class VarnishCache extends Plugin
                 }
             }
         );
+
+        Event::on(
+            Plugins::class,
+            Plugins::EVENT_AFTER_UPDATE_SLUG_AND_URI,
+            function (PluginEvent $event) {
+                if ($event->plugin === $this) {
+                    if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
+                        $job = new PreloadSitemapJob();
+                        QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
+                        
+                    }
+                }
+            }
+        );
+
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
