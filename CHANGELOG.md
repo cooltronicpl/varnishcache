@@ -1,5 +1,9 @@
 # Varnish Cache & Preload to static HTML Changelog
 
+## 1.2.1 - 2023-08-09
+
+- **Fix**: Rectified an issue where the Live Preview functionality in Craft CMS was not displaying the latest changes when the plugin was enabled. The caching mechanism has been updated to recognize and bypass the cache for Live Preview requests, ensuring that users can see their real-time edits without interference from cached versions of the page.
+
 ## 1.2.0 - 2023-06-21 [CRITICAL]
 
 - **Enhancement**: Implemented an event to trigger automatic cache refresh when entries are updated or undergo modifications.

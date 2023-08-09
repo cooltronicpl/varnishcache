@@ -1,7 +1,7 @@
 {
     "pluginName": "Varnish Cache & Preload to HTML",
     "pluginDescription": "The Varnish Cache & Preload Plugin is a revolutionary tool designed to optimize your website's performance with optional Varnish purge and preload your site into HTML files.",
-    "pluginVersion": "1.2.0",
+    "pluginVersion": "1.2.1",
     "pluginAuthorName": "CoolTRONIC.pl sp. z o.o. (LLC)",
     "pluginVendorName": "cooltronicpl",
     "pluginAuthorUrl": "http://cooltronic.pl/",

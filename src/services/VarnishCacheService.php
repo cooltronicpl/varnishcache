@@ -39,6 +39,10 @@ class VarnishCacheService extends Component
 
     public function checkForCacheFile()
     {
+        // Bypass cache for live preview
+        if (\Craft::$app->request->getQueryParam('x-craft-live-preview')) {
+            return;
+        }      
         if (!$this->canCreateCacheFile()) {
             return;
         }
@@ -178,6 +182,10 @@ class VarnishCacheService extends Component
      */
     public function createCacheFile()
     {
+        // Check for live preview parameters
+        if (\Craft::$app->request->getQueryParam('x-craft-live-preview')) {
+            return;
+        }
         if (!$this->canCreateCacheFile() || http_response_code() !== 200) {
             return;
         }
