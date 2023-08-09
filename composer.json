@@ -2,7 +2,7 @@
     "name": "cooltronicpl/varnishcache",
     "description": "The Varnish Cache & Preload Plugin is a revolutionary tool designed to optimize your website's performance with optional Varnish purge and preload your site into HTML files.",
     "type": "craft-plugin",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "keywords": [
         "craft",
         "cms",
