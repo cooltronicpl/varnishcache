@@ -33,6 +33,7 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching h
 
 - **Static HTML Generation**: Generates static HTML files from your dynamic CMS projects, improving page load times and Core Web Vitals.
 - **Varnish Cache Purging**: Purges the Varnish cache, ensuring that your website always serves the most recent version of your files.
+- **Cloudflare Cache Purging**: The plugin clears the Cloudflare cache when you update your content, so your visitors always see the latest version of your website.
 - **Caching Helper Solution**: Provides a caching helper solution, making it easy to manage your cache and improve the performance of your website.
 
 ## Installation
