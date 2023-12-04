@@ -1,6 +1,6 @@
 # Varnish Cloudflare & Preload Plugin for Craft CMS 4.x
 
-With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
+With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish or Cloudflare cache, resulting in faster page load times and improved Core Web Vitals.
 
 ![Icon](resources/black.png#gh-light-mode-only)
 ![Icon](resources/white.png#gh-dark-mode-only)
