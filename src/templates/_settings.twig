@@ -1,7 +1,8 @@
 {% extends "varnishcache/_layouts/cpp.twig" %}
 
 {% import "_includes/forms" as forms %}
-{% set title = 'Varnish Cache & Preload to static HTML' %}
+
+{% set title = 'Varnish Cloudflare & Preload' %}
 
 {% set selectedTab = 'general' %}
 
@@ -10,6 +11,7 @@
     preload: {label: 'Preload'|t, url: '#preload'},
     cron: {label: 'CRON'|t, url: '#cron'},
     varnish: {label: 'Varnish'|t, url: '#varnish'},
+    cloudflare: {label: 'Cloudflare'|t, url: '#cloudflare'},
     stats: {label: 'Stats'|t, url: '#stats'}
 } %}
 {% block content %}
@@ -20,12 +22,12 @@
 			<h2>
 				Welcome!
 			</h2>
-			<p>Welcome to the comprehensive guide on the Varnish Cache Plugin Settings. This guide will walk you through the various settings for enabling and configuring the cache, as well as providing statistics about the cache's performance.
+			<p>Welcome to the comprehensive guide on the Varnish Cloudflare & Preload Plugin Settings. This guide will walk you through the various settings for enabling and configuring the cache, as well as providing statistics about the cache's performance.
 			</p>
 
 			<h2>General Settings</h2>
 
-			<p>The general settings section is the first step in configuring your Varnish Cache Plugin. Here, you can enable the plugin, force it to be always on, and even optimize the cached content by removing whitespaces. You can also set the default cache expiration time, which is the amount of minutes a cached request is valid. If you wish, you can purge all current cached files instantly.</p>
+			<p>The general settings section is the first step in configuring your Varnish Cloudflare & Preload Plugin. Here, you can enable the plugin, force it to be always on, and even optimize the cached content by removing whitespaces. You can also set the default cache expiration time, which is the amount of minutes a cached request is valid. If you wish, you can purge all current cached files instantly.</p>
 
 			{{ forms.lightswitchField({
     label: "Enable Plugin?" | t,
@@ -176,6 +178,7 @@
 }) }}
 		</div>
 
+
 		<div id="content-varnish" class="tab-content">
 			<h2>Varnish Settings</h2>
 			<p>
@@ -198,6 +201,20 @@
     errors: settings.getErrors('varnishBan'),
     on: settings.varnishBan
 }) }}
+		</div>
+
+
+		<div id="content-cloudflare" class="tab-content">
+			<h2>Cloudflare Settings</h2>
+			<p>
+				You can enable Cloudflare cache clearing for your site by entering your Cloudflare account details below.
+			</p>
+			{{ forms.lightswitchField({ label: 'Enable Cloudflare' | t, id: 'enableCloudflare', name: 'enableCloudflare', instructions: 'Turn on this switch to purge Cloudflare cache when you clear the Craft CMS cache' | t, errors: settings.getErrors('enableCloudflare'), on: settings.enableCloudflare }) }}
+			{{ forms.textField({ label: "Global Cloudflare API Key" | t, id: 'cloudflareApi', name: 'cloudflareApi', instructions: "Enter your Global Cloudflare API Key, which you can find in your Cloudflare Account Profile"|t, value: settings.cloudflareApi, errors: settings.getErrors('cloudflareApi') }) }}
+			{{ forms.textField({ label: "Cloudflare Zone ID" | t, id: 'cloudflareZone', name: 'cloudflareZone', instructions: "Enter your Cloudflare Zone ID, which you can find in your Cloudflare dashboard under the Overview tab"|t, value: settings.cloudflareZone, errors: settings.getErrors('cloudflareZone') }) }}
+			{{ forms.textField({ label: "Cloudflare Email Address" | t, id: 'cloudflareEmail', name: 'cloudflareEmail', instructions: "Enter the email address that is associated with your Cloudflare account"|t, value: settings.cloudflareEmail, errors: settings.getErrors('cloudflareEmail') }) }}
+			<input type="submit" class="btn btngroup-btn-first" value="Test Cloudflare connection" form="test-cloudflare" onclick="submitForm('/test-cloudflare')">
+
 		</div>
 		<div id="content-stats" class="tab-content">
 
@@ -282,3 +299,16 @@ $(this).addClass('sel');
 	</script>
 {% endblock %}
 
+{% html at beginBody %}
+<form style="display:none" method="post" id="test-cloudflare">
+	{% import "_includes/forms" as forms %}
+	{{ csrfInput() }}
+	{{ actionInput('varnishcache/cloudflare/cloudflare') }}
+	{{ hiddenInput('function', 'testCloudflare') }}
+	{{ forms.button({
+                label: "Test Cloudflare connection"|t,
+                type: 'submit',
+                method: 'post'
+            }) }}
+</form>
+{% endhtml %}

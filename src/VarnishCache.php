@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Varnish Cache & Preload to static HTML Helper plugin for Craft CMS 3.x & 4.x
+ * Varnish Cloudflare & Preload to static HTML Helper plugin for Craft CMS 4.x
  *
- * Varnish Cache & Preload to static HTML Helper Plugin with http & htttps
+ * Varnish Cloudflare & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -33,18 +33,13 @@ use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 use craft\elements\Entry;
 use craft\events\ElementEvent;
+use cooltronicpl\varnishcache\controller\CloudflareController;
 
 /**
- * Craft plugins are very much like little applications in and of themselves. We’ve made
- * it as simple as we can, but the training wheels are off. A little prior knowledge is
- * going to be required to write a plugin.
- *
- * For the purposes of the plugin docs, we’re going to assume that you know PHP and SQL,
- * as well as some semi-advanced concepts like object-oriented programming and PHP namespaces.
- *
- * https://craftcms.com/docs/plugins/introduction
- *
- * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
+ * 
+ * @link      https://cooltronic.pl
+ * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
+ * @author    Pawel Potacki
  * @package   VarnishCache
  * @since     1.0.0
  *
@@ -77,6 +72,10 @@ class VarnishCache extends Plugin
     {
         return true;
     }
+
+    public $controllerMap = [
+        'cloudflare' => CloudflareController::class,
+    ];
 
     /**
      * @return Settings
@@ -124,9 +123,6 @@ class VarnishCache extends Plugin
         self::$plugin = $this;
         // Register the VarnishCacheController
 
-        $this->controllerMap = [
-            'varnish-cache' => VarnishCacheController::class,
-        ];
         // ignore console requests
         if ($this->isInstalled && !\Craft::$app->request->getIsConsoleRequest()) {
             $this->setComponents(

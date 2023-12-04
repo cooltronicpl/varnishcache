@@ -1,4 +1,4 @@
-# Varnish Cache & Preload to HTML Plugin for Craft CMS
+# Varnish Cloudflare & Preload Plugin for Craft CMS 4.x
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
 
@@ -13,6 +13,7 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching h
   - [Preloading Server Cache from Sitemap](#preloading-server-cache-from-sitemap)
   - [Configuring Varnish Cache](#configuring-varnish-cache)
   - [Using Varnish Cache](#using-varnish-cache)
+  - [How to use Cloudflare with this plugin?](#how-to-use-cloudflare-with-this-plugin)
   - [Disabling or Clearing Some URL](#disabling-or-clearing-some-url)
 - [FAQ](#faq)
   - [Q: Are all cache files deleted when updating an entry, or only the ones with a relation?](#q-are-all-cache-files-deleted-when-updating-an-entry-or-only-the-ones-with-a-relation)
@@ -46,7 +47,7 @@ You can also install the plugin directly from the [Craft CMS plugin store](https
 
 ## Usage
 
-This section provides detailed instructions and examples on how to use the Varnish Cache & Preload to static HTML Helper Plugin.
+This section provides detailed instructions and examples on how to use the Varnish Cloudflare & Preload to static HTML Helper Plugin.
 
 ### Preloading Server Cache from Sitemap
 
@@ -59,6 +60,16 @@ The plugin works out of the box and does not require special cache tags, unless 
 ### Using Varnish Cache
 
 Varnish Cache has a settings page where you can enable or disable it and flush the cache. If the plugin is working correctly, you will see the cached files in the `storage/runtime/varnishcache/` folder. To check the performance improvement, please use the browser inspector. There, you will be able to see the improved loading times.
+
+### How to use Cloudflare with this plugin?
+
+To use Cloudflare with this plugin, you need to enter your Cloudflare account details in the plugin settings. You need the following information:
+
+- Your Cloudflare API Key, which you can find in your [Cloudflare Account Profile].
+- Your Cloudflare Zone ID, which you can find in your [Cloudflare dashboard] under the Overview tab for your domain.
+- Your Cloudflare Email Address, which is the email address that you use to log in to your Cloudflare account.
+
+After you enter your Cloudflare account details, you should test the connection to Cloudflare by clicking the “Test Cloudflare connection” button. If the connection is successful, you will see a notice that says “Cloudflare connection successful”. This means that the plugin can communicate with Cloudflare and clear the Cloudflare cache when you clear the Craft CMS cache.
 
 ### Disabling or Clearing Some URL
 
@@ -110,6 +121,7 @@ A: If some URL preloading is failing, you can try to increase the preload time i
 A: To reset the cache, navigate to the settings and enable the **Purge all Cache now?** option. Don't forget to click "Save" to apply the changes.
 
 ### Q: What if the plugin's control panel settings don't match the screenshots?
+
 A: You might need to clear the Craft CMS Cache. Navigate to the **Utilities** Tab, select **Caches**, and then click on **Clear cache**.
 
 ## Support
@@ -118,7 +130,7 @@ If you encounter any issues or have questions about the plugin, please create an
 
 ## Contribution
 
-We welcome contributions to the Varnish Cache & Preload to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
+We welcome contributions to the Varnish Cloudflare & Preload to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
 
 ## License
 

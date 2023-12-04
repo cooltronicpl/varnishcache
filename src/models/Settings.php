@@ -1,8 +1,8 @@
 <?php
 /**
- * Varnish Cache & Preload to static HTML Helper plugin for Craft CMS 3.x & 4.x
+ * Varnish Cloudflare & Preload to static HTML Helper plugin for Craft CMS 4.x
  *
- * Varnish Cache & Preload to static HTML Helper Plugin with http & htttps
+ * Varnish Cloudflare & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -28,6 +28,10 @@ class Settings extends Model
     public $varnishBan = 0;
     public $interval = 5;
     public $runAll = 0;
+    public $enableCloudflare = 0;
+    public $cloudflareZone = "";
+    public $cloudflareApi = "";
+    public $cloudflareEmail = "";
     public $averageAge;
     public $totalSize;
     public $numberCached;
@@ -51,7 +55,10 @@ class Settings extends Model
             [['preloadAverage'], 'integer'],
             [['firstLoadAverage'], 'integer'],
             [['runAll'], 'boolean'],
-            [['sitemap'], 'each', 'rule' => ['string']]
+            [['enableCloudflare'], 'boolean'],
+            [['cloudflareZone'], 'string'],
+            [['cloudflareApi'], 'string'],
+            [['cloudflareEmail'], 'string'],
         ];
     }
 }

@@ -1,4 +1,10 @@
-# Varnish Cache & Preload to static HTML Changelog
+# Varnish Cloudflare & Preload Changelog
+
+## 2.4.0 - 2023-12-04
+
+- **Enhancement**: Added support for Cloudflare cache clearing. You can enter your Cloudflare API Key, Zone ID, and Email in the plugin settings and test the connection to Cloudflare. The plugin will automatically clear the Cloudflare cache when you clear the Craft CMS cache.
+- **Fix**: Fixed an issue that prevented adding multiple custom sitemaps. You can now enter multiple sitemap strings in the plugin settings and the plugin will generate the corresponding sitemap files for your site.
+- **Note**: We have dropped support for the craft3 brach for Craft CMS 3.x for feature updates. If you are using the 3.x branch, please upgrade to the 4.x branch to get the latest features and bug fixes.
 
 ## 2.3.1 - 2023-08-09
 
