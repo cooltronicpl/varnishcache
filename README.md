@@ -35,6 +35,9 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching
 - **Cloudflare Cache Purging**: The plugin clears the Cloudflare cache when you update your content, so your visitors always see the latest version of your website.
 - **Varnish Cache Purging**: Purges the Varnish cache, ensuring that your website always serves the most recent version of your files.
 - **Caching Helper Solution**: Provides a caching helper solution, making it easy to manage your cache and improve the performance of your website.
+- **Preload**: Provides a mechanism to scan sitemaps, which can also be utilized with Varnish and Cloudflare's Purging mechanism to ensure the greatest possible load times for your updated website.
+
+
 
 ## Installation
 
