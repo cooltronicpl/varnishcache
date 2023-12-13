@@ -37,8 +37,6 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching
 - **Caching Helper Solution**: Provides a caching helper solution, making it easy to manage your cache and improve the performance of your website.
 - **Preload**: Provides a mechanism to scan sitemaps, which can also be utilized with Varnish and Cloudflare's Purging mechanism to ensure the greatest possible load times for your updated website.
 
-
-
 ## Installation
 
 To install this plugin, copy the following command to your terminal:

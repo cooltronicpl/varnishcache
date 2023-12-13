@@ -2,7 +2,7 @@
     "name": "cooltronicpl/varnishcache",
     "description": "Boost the performance of your site with Cloudflare or Varnish.",
     "type": "craft-plugin",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "keywords": [
         "craft",
         "cms",
@@ -23,10 +23,9 @@
         "warmup",
         "sitemap",
         "speed",
-        "cloudflare",
         "cdn",
-        "varnish",
-        "reverse proxy"
+        "reverse proxy",
+		"speedup"
     ],
     "support": {
         "docs": "https://github.com/cooltronicpl/varnishcache/blob/master/README.md",
@@ -58,7 +57,7 @@
     "extra": {
         "name": "CDN Cache & Preload",
         "handle": "varnishcache",
-        "schemaVersion": "2.5.0",
+        "schemaVersion": "2.5.1",
         "hasCpSettings": true,
         "hasCpSection": false,
         "allowAnonymous": true,

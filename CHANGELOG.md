@@ -1,8 +1,16 @@
 # CDN Cache & Preload Changelog
 
+## 2.5.1 - 2023-12-13
+
+### Fixed
+
+- Fixed a typo in the readme file.
+- Fixed a typo in the 2.5.0 entry of the changelog file.
+- Fixed a typo in composer file.
+
 ## 2.5.0 - 2023-12-13
 
-## Changed
+### Changed
 
 - Unified the plugin codebase for Craft CMS 3.x and 4.x by merging the `craft3` branch into the `master` branch.
 - Renamed the plugin throughout the project to match the name on the plugin store.
