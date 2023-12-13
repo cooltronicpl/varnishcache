@@ -1,8 +1,8 @@
 {
     "name": "cooltronicpl/varnishcache",
-    "description": "The Varnish Cloudflare & Preload Plugin is a revolutionary tool designed to optimize your website's performance.",
+    "description": "Boost the performance of your site with Cloudflare or Varnish.",
     "type": "craft-plugin",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "keywords": [
         "craft",
         "cms",
@@ -22,7 +22,11 @@
         "preheat",
         "warmup",
         "sitemap",
-        "speed"
+        "speed",
+        "cloudflare",
+        "cdn",
+        "varnish",
+        "reverse proxy"
     ],
     "support": {
         "docs": "https://github.com/cooltronicpl/varnishcache/blob/master/README.md",
@@ -42,7 +46,9 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^4.0"
+      "craftcms/cms": "^4.0|^3.0",
+      "ext-curl": "*",
+      "ext-simplexml": "*"
     },
     "autoload": {
         "psr-4": {
@@ -50,11 +56,12 @@
         }
     },
     "extra": {
-        "name": "Varnish Cloudflare & Preload",
+        "name": "CDN Cache & Preload",
         "handle": "varnishcache",
-        "schemaVersion": "1.0.0",
+        "schemaVersion": "2.5.0",
         "hasCpSettings": true,
         "hasCpSection": false,
+        "allowAnonymous": true,
         "class": "cooltronicpl\\varnishcache\\VarnishCache"
     }
 }

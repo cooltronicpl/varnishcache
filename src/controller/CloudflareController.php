@@ -6,7 +6,11 @@ use Craft;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
+use craft\web\ServiceUnavailableHttpException;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\HttpException;
+use yii\web\UnauthorizedHttpException;
 
 /**
  *
@@ -18,8 +22,14 @@ use yii\web\HttpException;
  */
 class CloudflareController extends Controller
 {
-    protected array|int|bool $allowAnonymous = ['cloudflare'];
 
+    /**
+     * @throws ServiceUnavailableHttpException
+     * @throws UnauthorizedHttpException
+     * @throws HttpException
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     */
     public function beforeAction($action): bool
     {
         if (Craft::$app->request->isPost) {
@@ -33,6 +43,9 @@ class CloudflareController extends Controller
         }
     }
 
+    /**
+     * @throws HttpException
+     */
     public function actionCloudflare()
     {
         $function = Craft::$app->request->getParam('function');
@@ -41,7 +54,7 @@ class CloudflareController extends Controller
             return Json::encode($result);
 
         } else {
-            throw new HttpException(400, 'Invalid function name: ' . $function);
+            throw new HttpException(400, 'Invalid function name: ' . StringHelper::toString($function));
         }
     }
 

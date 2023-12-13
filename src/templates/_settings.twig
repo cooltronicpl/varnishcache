@@ -2,7 +2,7 @@
 
 {% import "_includes/forms" as forms %}
 
-{% set title = 'Varnish Cloudflare & Preload' %}
+{% set title = 'CDN Cache & Preload' %}
 
 {% set selectedTab = 'general' %}
 
@@ -22,12 +22,12 @@
 			<h2>
 				Welcome!
 			</h2>
-			<p>Welcome to the comprehensive guide on the Varnish Cloudflare & Preload Plugin Settings. This guide will walk you through the various settings for enabling and configuring the cache, as well as providing statistics about the cache's performance.
+			<p>Welcome to the comprehensive guide on the CDN Cache & Preload Plugin Settings. This guide will walk you through the various settings for enabling and configuring the cache, as well as providing statistics about the cache's performance.
 			</p>
 
 			<h2>General Settings</h2>
 
-			<p>The general settings section is the first step in configuring your Varnish Cloudflare & Preload Plugin. Here, you can enable the plugin, force it to be always on, and even optimize the cached content by removing whitespaces. You can also set the default cache expiration time, which is the amount of minutes a cached request is valid. If you wish, you can purge all current cached files instantly.</p>
+			<p>The general settings section is the first step in configuring your CDN Cache & Preload Plugin. Here, you can enable the plugin, force it to be always on, and even optimize the cached content by removing whitespaces. You can also set the default cache expiration time, which is the amount of minutes a cached request is valid. If you wish, you can purge all current cached files instantly.</p>
 
 			{{ forms.lightswitchField({
     label: "Enable Plugin?" | t,
@@ -301,14 +301,8 @@ $(this).addClass('sel');
 
 {% html at beginBody %}
 <form style="display:none" method="post" id="test-cloudflare">
-	{% import "_includes/forms" as forms %}
 	{{ csrfInput() }}
 	{{ actionInput('varnishcache/cloudflare/cloudflare') }}
 	{{ hiddenInput('function', 'testCloudflare') }}
-	{{ forms.button({
-                label: "Test Cloudflare connection"|t,
-                type: 'submit',
-                method: 'post'
-            }) }}
 </form>
 {% endhtml %}

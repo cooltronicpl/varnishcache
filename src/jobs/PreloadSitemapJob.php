@@ -1,8 +1,8 @@
 <?php
 /**
- * Varnish Cloudflare & Preload to static HTML Helper plugin for Craft CMS 4.x
+ * CDN Cache & Preload to static HTML Helper plugin for Craft CMS 4.x
  *
- * Varnish Cloudflare & Preload to static HTML Helper Plugin with http & htttps
+ * CDN Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -54,8 +54,6 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
                 foreach ($taskIds as $taskId) {
                     $queue->release($taskId);
                 }
-            }
-            if (VarnishCache::getInstance()->getSettings()->resetQueue == true) {
                 $job = new PreloadSitemapJob();
                 $this->hasRun = false;
                 $nextTask = QueueSingleton::getInstance();

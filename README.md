@@ -1,4 +1,4 @@
-# Varnish Cloudflare & Preload Plugin for Craft CMS 4.x
+# CDN Cache & Preload Plugin for Craft CMS 4.x
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish cache, resulting in faster page load times and improved Core Web Vitals.
 
@@ -32,6 +32,7 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents caching h
 ## Features
 
 - **Static HTML Generation**: Generates static HTML files from your dynamic CMS projects, improving page load times and Core Web Vitals.
+- **Cloudflare CDN**: The add-on is compatible with Cloudflare, a popular CDN service that stores your static content on its servers. 
 - **Varnish Cache Purging**: Purges the Varnish cache, ensuring that your website always serves the most recent version of your files.
 - **Caching Helper Solution**: Provides a caching helper solution, making it easy to manage your cache and improve the performance of your website.
 
@@ -47,7 +48,7 @@ You can also install the plugin directly from the [Craft CMS plugin store](https
 
 ## Usage
 
-This section provides detailed instructions and examples on how to use the Varnish Cloudflare & Preload to static HTML Helper Plugin.
+This section provides detailed instructions and examples on how to use the CDN Cache & Preload to static HTML Helper Plugin.
 
 ### Preloading Server Cache from Sitemap
 
@@ -106,7 +107,7 @@ A: You can use the vcl file from [our project](https://github.com/cooltronicpl/-
 
 ### Q: Which branch should I install for my Craft CMS?
 
-A: The 1.x branch is suitable for Craft CMS 3, whereas the 2.x branch is for Craft CMS 4.
+A: The 2.x branch is suitable for Craft CMS 3 & 4 since 2.5.0, before that for Craft CMS 3.x it was used `craft3` branch with versions 1.x, whereas the 2.x branch is for Craft CMS 4.
 
 ### Q: My Preloading CRON failed. What could be the reason?
 
@@ -130,7 +131,7 @@ If you encounter any issues or have questions about the plugin, please create an
 
 ## Contribution
 
-We welcome contributions to the Varnish Cloudflare & Preload to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
+We welcome contributions to the CDN Cache & Preload to static HTML Helper plugin. Please read our contribution guidelines and submit your pull requests.
 
 ## License
 

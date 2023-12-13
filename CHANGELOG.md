@@ -1,4 +1,12 @@
-# Varnish Cloudflare & Preload Changelog
+# CDN Cache & Preload Changelog
+
+## 2.5.0 - 2023-12-13
+
+## Changed
+
+Unified the plugin codebase for Craft CMS 3.x and 4.x by merging the `craft3` branch into the `master` branch.
+Renamed the plugin throughout the project to match the name on the plugin store.
+Improved the plugin code quality and consistency by refactoring the internal code and variables.
 
 ## 2.4.0 - 2023-12-04
 

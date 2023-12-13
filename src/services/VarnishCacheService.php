@@ -577,7 +577,6 @@ class VarnishCacheService extends Component
     {
         $delay = 0;
         $preloadInterval = $this->settings->interval;
-        $queue = \Craft::$app->getQueue();
         $nextTask = QueueSingleton::getInstance();
         if ($this->settings->runAll) {
             foreach ($urls as $url) {
@@ -643,109 +642,77 @@ class VarnishCacheService extends Component
             $baseUrl = $app->sites->getCurrentSite()->baseUrl;
             $parsedUrl = parse_url($url);
 
-            $purgeurl = $parsedUrl['path'] ?? '';
-            $purgeurl = ltrim($purgeurl, '/');
-            $varnishurl = $baseUrl . $purgeurl;
-            $varnishhost = 'Host: ' . $_SERVER['SERVER_NAME'];
+            $purge = $parsedUrl['path'] ?? '';
+            $purge = ltrim($purge, '/');
+            $varnish = $baseUrl . $purge;
+            $varnishHost = 'Host: ' . $_SERVER['SERVER_NAME'];
             if (VarnishCache::getInstance()->getSettings()->varnishBan == true) {
-                $varnishcommand = 'BAN';
+                $varnishCommand = 'BAN';
             } else {
-                $varnishcommand = 'PURGE';
+                $varnishCommand = 'PURGE';
             }
 
-            $curl = curl_init($varnishurl);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array($varnishhost));
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishcommand);
-            curl_setopt($curl, CURLOPT_ENCODING, $varnishhost);
+            $curl = curl_init($varnish);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array($varnishHost));
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishCommand);
+            curl_setopt($curl, CURLOPT_ENCODING, $varnishHost);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             if (curl_exec($curl) === false) {
-                \Craft::error('Purge Varnish Error: ' . var_dump(curl_error($curl)) . ', purgeUrl: ' . $purgeurl . ', varnishUrl' . $varnishurl);
+                \Craft::error('Purge Varnish Error: ' . var_dump(curl_error($curl)) . ', purgeUrl: ' . $purge . ', varnishUrl' . $varnish);
             }
-            \Craft::info('Purge Varnish response purgeUrl: ' . $purgeurl . ', varnishUrl: ' . $varnishurl);
+            \Craft::info('Purge Varnish response purgeUrl: ' . $purge . ', varnishUrl: ' . $varnish);
             curl_close($curl);
         }
         if (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
             
-            $zoneid = VarnishCache::getInstance()->getSettings()->cloudflareZone;
-
-            // Define the Cloudflare API endpoint
-            $endpoint = "https://api.cloudflare.com/client/v4/zones/$zoneid";
-
-            // Define the Cloudflare API key and email
-            $api_key = VarnishCache::getInstance()->getSettings()->cloudflareApi;
-            $email = VarnishCache::getInstance()->getSettings()->cloudflareEmail; 
-
-            // Initialize a curl session
+            $zoneId = VarnishCache::getInstance()->getSettings()->cloudflareZone;
+            $endpoint = "https://api.cloudflare.com/client/v4/zones/$zoneId";
+            $apiKey = VarnishCache::getInstance()->getSettings()->cloudflareApi;
+            $email = VarnishCache::getInstance()->getSettings()->cloudflareEmail;
             $ch = curl_init();
 
-            // Set the curl options
             curl_setopt($ch, CURLOPT_URL, $endpoint);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                 "X-Auth-Email: $email",
-                "X-Auth-Key: $api_key",
+                "X-Auth-Key: $apiKey",
                 "Content-Type: application/json",
             ));
 
-            // Execute the curl request and get the response
             $response = curl_exec($ch);
-
-            // Check for errors
             if (curl_errno($ch)) {
-                // Handle error
                 \Craft::error("Cloudflare Curl error: " . curl_error($ch));
             } else {
-                // Decode the response as an associative array
                 $data = json_decode($response, true);
-
-                // Check if the response is successful
                 if ($data["success"]) {
-                    // Loop through the zones and find the one that matches the domain
                     foreach ($data["result"] as $zone) {
 
-                            // Define the purge cache endpoint
-                            $purge_endpoint = "$endpoint/$zone/purge_cache";
-
-                            // Define the purge cache parameters
-                            $purge_params = array(
+                            $purgeEndpoint = "$endpoint/$zone/purge_cache";
+                            $purgeParams = array(
                                 "files" => array($url),
                             );
 
-                            // Encode the purge cache parameters as a JSON string
-                            $purge_json = json_encode($purge_params);
-
-                            // Set the curl options for the purge cache request
-                            curl_setopt($ch, CURLOPT_URL, $purge_endpoint);
+                            $purgeJson = json_encode($purgeParams);
+                            curl_setopt($ch, CURLOPT_URL, $purgeEndpoint);
                             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                            curl_setopt($ch, CURLOPT_POSTFIELDS, $purge_json);
-
-                            // Execute the purge cache request and get the response
-                            $purge_response = curl_exec($ch);
-
-                            // Decode the purge cache response as an associative array
-                            $purge_data = json_decode($purge_response, true);
-
-                            // Check if the purge cache response is successful
-                            if ($purge_data["success"]) {
-                                // Handle success
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, $purgeJson);
+                            $purgeResponse = curl_exec($ch);
+                            $purgeData = json_decode($purgeResponse, true);
+                            if ($purgeData["success"]) {
                                 \Craft::info("Cloudflare cache cleared for $url");
                             } else {
-                                // Handle error
-                                \Craft::error("Cloudflare cache purge failed: " . $purge_data["errors"][0]["message"]);
+                                \Craft::error("Cloudflare cache purge failed: " . $purgeData["errors"][0]["message"]);
                             }
 
-                            // Break the loop
                             break;
                         
                     }
                 } else {
-                    // Handle error
                     \Craft::error("Cloudflare API request failed: " . $data["errors"][0]["message"]);
                 }
             }
 
-            // Close the curl session
             curl_close($ch);
         }
 

@@ -1,14 +1,15 @@
 {
-    "pluginName": "Varnish Cloudflare & Preload",
-    "pluginDescription": "The Varnish Cloudflare & Preload Plugin is a revolutionary tool designed to optimize your website's performance.",
-    "pluginVersion": "2.4.0",
+    "pluginName": "CDN Cache & Preload",
+    "pluginDescription": "Boost the performance of your site with Cloudflare.",
+    "pluginVersion": "2.5.0",
     "pluginAuthorName": "CoolTRONIC.pl sp. z o.o. (LLC)",
     "pluginVendorName": "cooltronicpl",
     "pluginAuthorUrl": "https://cooltronic.pl/",
     "pluginAuthorGithub": "cooltronicpl",
     "codeComments": "yes",
     "pluginComponents": [
-        "controllers"
+        "controllers",
+        "settings"
     ],
     "consolecommandName": "",
     "controllerName": "",

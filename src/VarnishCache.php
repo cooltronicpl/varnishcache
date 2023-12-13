@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Varnish Cloudflare & Preload to static HTML Helper plugin for Craft CMS 4.x
+ * CDN Cache & Preload to static HTML Helper plugin for Craft CMS 4.x
  *
- * Varnish Cloudflare & Preload to static HTML Helper Plugin with http & htttps
+ * CDN Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
@@ -56,9 +56,6 @@ class VarnishCache extends Plugin
      * @var VarnishCache
      */
     public static $plugin;
-    public string $schemaVersion = '1.0.0';
-    public bool $allowAnonymous = true;
-    public bool $hasCpSettings = true;
     public $job;
     // Public Methods
     // =========================================================================
