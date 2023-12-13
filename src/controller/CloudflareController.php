@@ -17,7 +17,7 @@ use yii\web\UnauthorizedHttpException;
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
- * @since     2.3.2
+ * @since     2.4.0
  *
  */
 class CloudflareController extends Controller
