@@ -1,4 +1,4 @@
-# CDN Cache & Preload Plugin for Craft CMS 4.x
+# CDN Cache & Preload Plugin for Craft CMS 4.x & 3.x
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish or Cloudflare cache, resulting in faster page load times and improved Core Web Vitals.
 
