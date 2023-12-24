@@ -70,54 +70,41 @@ class VarnishCacheService extends Component
     {
         $app = \Craft::$app;
 
-        // Check various conditions and return false if any of them are met
         switch (true) {
-            // forced mode in all cases when enabled
             case $this->settings->enableGeneral && $this->settings->forceOn == true:
                 break;
 
-            // Skip if we're running in devMode and not in force mode
             case $app->config->general->devMode === true && $this->settings->forceOn == false:
                 return false;
 
-            // Skip if not enabled
             case $this->settings->enableGeneral == false:
                 return false;
 
-            // Skip if system is not on and not in force mode
             case !$app->getIsSystemOn() && $this->settings->forceOn == false:
                 return false;
 
-            // Skip if it's a CP Request
             case $app->request->getIsCpRequest():
                 return false;
 
-            // Skip if it's an action Request
             case $app->request->getIsActionRequest():
                 return false;
 
-            // Skip if it's a preview request
             case $app->request->getIsLivePreview():
                 return false;
 
-            // Skip if it's a post request
             case !$app->request->getIsGet():
                 return false;
 
-            // Skip if it's an ajax request
             case $app->request->getIsAjax():
                 return false;
 
-            // Skip if route from element api
             case $this->isElementApiRoute():
                 return false;
 
-            // Skip if currently requested URL path is excluded
             case $this->isPathExcluded():
                 return false;
         }
 
-        // If none of the conditions above were met, return true
         return true;
     }
 
@@ -134,7 +121,6 @@ class VarnishCacheService extends Component
             $elementApiRoutes = $plugin->getSettings()->endpoints;
             $routes = array_keys($elementApiRoutes);
             foreach ($routes as $route) {
-                // form the correct expression
                 $route = preg_replace('~\<.*?:(.*?)\>~', '$1', $route);
                 $found = preg_match('~' . $route . '~', $this->uri);
                 if ($found) {
@@ -153,19 +139,13 @@ class VarnishCacheService extends Component
 
     private function isPathExcluded()
     {
-        // determine currently requested URL path and the multi-site ID
         $requestedPath = \Craft::$app->request->getFullPath();
         $requestedSiteId = \Craft::$app->getSites()->getCurrentSite()->id;
-
-        // compare with excluded paths and sites from the settings
         if (!empty($this->settings->excludedUrlPaths)) {
             foreach ($this->settings->excludedUrlPaths as $exclude) {
                 $path = reset($exclude);
                 $siteId = intval(next($exclude));
-
-                // check if requested path is one of those of the settings
                 if ($requestedPath == $path || preg_match('@' . $path . '@', $requestedPath)) {
-                    // and if requested site either corresponds to the exclude setting or if it's unimportant at all
                     if ($requestedSiteId == $siteId || $siteId < 0) {
                         return true;
                     }
@@ -197,28 +177,23 @@ class VarnishCacheService extends Component
 
         if ($cacheEntry) {
             $content = ob_get_contents();
-
             if ($this->settings->optimizeContent) {
                 $content = implode("\n", array_map('trim', explode("\n", $content)));
             }
-
             $file = $this->getCacheFileName($cacheEntry->uid);
-            // Get the size of the cache file
             if (!$fp = fopen($file, 'w+')) {
-                \Craft::info('HTML Cache could not write cache file "' . $file . '"');
+                \Craft::debug('HTML Cache could not write cache file "' . $file . '"');
                 return;
             }
-
             fwrite($fp, $content);
             fclose($fp);
-            // Update the cacheSize field of the $cacheEntry instance
             $cacheEntry->cacheSize = filesize($file);
             $cacheEntry->save();
             $app = \Craft::$app;
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
 
         } else {
-            \Craft::info('HTML Cache could not find cache entry for siteId: "' . $this->siteId . '" and uri: "' . $this->uri . '"');
+            \Craft::debug('HTML Cache could not find cache entry for siteId: "' . $this->siteId . '" and uri: "' . $this->uri . '"');
         }
     }
 
@@ -230,15 +205,11 @@ class VarnishCacheService extends Component
      */
     public function clearCacheFile($elementId)
     {
-        // get all possible caches
         $elements = VarnishCacheElementRecord::findAll(['elementId' => $elementId]);
-        // \craft::Dd($elements);
         $cacheIds = array_map(function ($el) {
             return $el->cacheId;
         }, $elements);
         $app = \Craft::$app;
-
-        // get all possible caches
         $caches = VarnishCachesRecord::findAll(['id' => $cacheIds]);
         foreach ($caches as $cache) {
             $file = $this->getCacheFileName($cache->uid);
@@ -248,8 +219,6 @@ class VarnishCacheService extends Component
                 @unlink($file);
             }
         }
-
-        // delete caches for related entry
         VarnishCachesRecord::deleteAll(['id' => $cacheIds]);
 
         return true;
@@ -257,32 +226,26 @@ class VarnishCacheService extends Component
 
     public function clearCacheUri($uri)
     {
-        // get all possible caches
         $elements = VarnishCacheElementRecord::find()->all(['uri' => $uri]);
-        // \craft::Dd($elements);
         $cacheIds = array_map(function ($el) {
             return $el->cacheId;
         }, $elements);
-        \Craft::info('clearCacheUri Purge ids "' . implode(", ", $cacheIds) . '"');
-
-        //$cachesUri = VarnishCachesRecord::findAll(['uri' => $uri]);
-        //\Craft::info('clearCacheUri Purge ids "' . implode(", ",$cachesUri) . '"');
+        \Craft::debug('clearCacheUri Purge ids "' . implode(", ", $cacheIds) . '"');
         $app = \Craft::$app;
 
         foreach ($cacheIds as $cache) {
             $file = $this->getCacheFileName($cache->uid);
-            \Craft::info('clearCacheUri file "' . $file . '"');
+            \Craft::debug('clearCacheUri file "' . $file . '"');
 
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
 
-            \Craft::info('clearCacheUri Purge response: ' . $result . ' file: ' . $file);
+            \Craft::debug('clearCacheUri Purge response: ' . $result . ' file: ' . $file);
 
             if (file_exists($file)) {
                 @unlink($file);
             }
         }
 
-        // delete caches for related entry
         VarnishCachesRecord::deleteAll(['uri' => $cachesUri]);
         return null;
     }
@@ -290,13 +253,13 @@ class VarnishCacheService extends Component
     {
 
         $cachesUri = VarnishCachesRecord::findAll(['uri' => $uri]);
-        \Craft::info('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
+        \Craft::debug('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
 
         $app = \Craft::$app;
 
         foreach ($cachesUri as $cache) {
             $file = $this->getCacheFileName($cache);
-            \Craft::info('clearCacheCustom file "' . $file . '"');
+            \Craft::debug('clearCacheCustom file "' . $file . '"');
 
             $this->clearCacheUrl($url);
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
@@ -326,15 +289,14 @@ class VarnishCacheService extends Component
     public function clearCacheFiles()
     {
         $cachesUri = VarnishCachesRecord::findAll([]);
-        \Craft::info('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
+        \Craft::debug('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
 
-        // Get the site's base URL
         $app = \Craft::$app;
         $baseUrl = $app->sites->getCurrentSite()->baseUrl;
 
         foreach ($cachesUri as $cache) {
             $file = $this->getCacheFileName($cache);
-            \Craft::info('clearCacheCustom file "' . $file . '"');
+            \Craft::debug('clearCacheCustom file "' . $file . '"');
 
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
 
@@ -357,7 +319,6 @@ class VarnishCacheService extends Component
             $sitemaps[0] = "{$baseUrl}sitemap.xml";
         }
 
-        // Initialize an empty array to hold all URLs from all sitemaps.
         $allUrls = array();
         foreach ($sitemaps as $key => $sitemap) {
             $this->clearCacheUrl($sitemap);
@@ -367,24 +328,19 @@ class VarnishCacheService extends Component
                     throw new \Exception('Failed to open sitemap');
                 }
                 $xml = simplexml_load_string($content);
-                // Rest of your code...
             } catch (\Exception $e) {
                 \Craft::error('Error opening Sitemap: ' . $sitemap . ': ' . $e->getMessage());
                 continue;
             }
-            // Load the sitemap XML and extract the URLs
             foreach ($xml as $urlElement) {
-                // Convert the SimpleXMLElement to a string
                 $url = (string) $urlElement->loc;
                 if (!$this->isAbsoluteUrl($url)) {
-                    // If the URL is relative, treat it as a path and check if it's excluded
                     if ($this->isPathSExcluded($url)) {
                         continue;
                     }
                 } else {
                     $parsedUrl = parse_url($url);
                     $path = $parsedUrl['path'] ?? '';
-                    // Skip this URL if it's excluded
                     if ($this->isPathSExcluded($path)) {
                         continue;
                     }
@@ -420,7 +376,6 @@ class VarnishCacheService extends Component
 
     private function getDirectory()
     {
-        // Fallback to default directory if no storage path defined
         if (defined('CRAFT_STORAGE_PATH')) {
             $basePath = CRAFT_STORAGE_PATH;
         } else {
@@ -462,21 +417,14 @@ class VarnishCacheService extends Component
 
     private function isPathSExcluded($path)
     {
-        // determine the multi-site ID
         $requestedSiteId = \Craft::$app->getSites()->getCurrentSite()->id;
-
-        // compare with excluded paths and sites from the settings
         if (!empty($this->settings->excludedUrlPaths)) {
             foreach ($this->settings->excludedUrlPaths as $exclude) {
                 $excludePath = reset($exclude);
                 $siteId = intval(next($exclude));
-
-                // check if the path is one of those of the settings
                 if ($path == $excludePath || preg_match('@' . $excludePath . '@', $path)) {
-                    // and if requested site either corresponds to the exclude setting or if it's unimportant at all
                     if ($requestedSiteId == $siteId || $siteId < 0) {
-                        \Craft::info('Excluded: ' . $excludePath . ', ' . $path . " siteId: " . $requestedSiteId);
-
+                        \Craft::debug('Excluded: ' . $excludePath . ', ' . $path . " siteId: " . $requestedSiteId);
                         return true;
                     }
                 }
@@ -524,7 +472,6 @@ class VarnishCacheService extends Component
             $sitemaps[0] = "{$baseUrl}sitemap.xml";
         }
 
-        // Initialize an empty array to hold all URLs from all sitemaps.
         $allUrls = array();
         foreach ($sitemaps as $key => $sitemap) {
             $this->clearCacheUrl($sitemap);
@@ -534,24 +481,19 @@ class VarnishCacheService extends Component
                     throw new \Exception('Failed to open sitemap');
                 }
                 $xml = simplexml_load_string($content);
-                // Rest of your code...
             } catch (\Exception $e) {
                 \Craft::error('Error opening Sitemap: ' . $sitemap . ': ' . $e->getMessage());
                 continue;
             }
-            // Load the sitemap XML and extract the URLs
             foreach ($xml as $urlElement) {
-                // Convert the SimpleXMLElement to a string
                 $url = (string) $urlElement->loc;
                 if (!$this->isAbsoluteUrl($url)) {
-                    // If the URL is relative, treat it as a path and check if it's excluded
                     if ($this->isPathSExcluded($url)) {
                         continue;
                     }
                 } else {
                     $parsedUrl = parse_url($url);
                     $path = $parsedUrl['path'] ?? '';
-                    // Skip this URL if it's excluded
                     if ($this->isPathSExcluded($path)) {
                         continue;
                     }
@@ -559,11 +501,7 @@ class VarnishCacheService extends Component
                 $allUrls[] = $url;
             }
         }
-
-        // retrieve properties from the sitemap object
-        \Craft::info('Preload urls ' . implode(', ', $allUrls));
-
-        // Preload cache for Sitemap the URLs
+        \Craft::debug('Preload urls ' . implode(', ', $allUrls));
         $this->preloadCache($allUrls);
     }
 
@@ -596,22 +534,13 @@ class VarnishCacheService extends Component
 
     public function getCacheAnalytics()
     {
-        // Get all cache records
         $cacheRecords = VarnishCachesRecord::find()->all();
-
-        // Initialize variables for total size and total age
         $totalSize = 0;
         $totalAge = 0;
         $totalPreload = 0;
         $totalFirstLoad = 0;
-
-        // Loop through all cache records
         foreach ($cacheRecords as $cacheRecord) {
-            // Add the size of each cache file to the total size to KB
             $totalSize += $cacheRecord->cacheSize / (1024);
-
-            // Calculate the age of each cache file and add it to the total age
-            // Convert the difference between the current time and the creation time to minutes
             $age = (time() - strtotime($cacheRecord->createdAt)) / 60;
             $totalAge += $age;
             $preloadTime = $cacheRecord->preloadTime;
@@ -619,12 +548,9 @@ class VarnishCacheService extends Component
             $firstLoadTime = $cacheRecord->firstLoadTime;
             $totalFirstLoad += $firstLoadTime;
         }
-
-        // Calculate the average age
         $averageAge = count($cacheRecords) > 0 ? $totalAge / count($cacheRecords) : 0;
         $preloadAverage = count($cacheRecords) > 0 ? $totalPreload / count($cacheRecords) : 0;
         $firstLoadAverage = count($cacheRecords) > 0 ? $totalFirstLoad / count($cacheRecords) : 0;
-        // Return the total size and average age
         return [
             'totalSize' => $totalSize,
             'averageAge' => $averageAge,
@@ -651,7 +577,6 @@ class VarnishCacheService extends Component
             } else {
                 $varnishCommand = 'PURGE';
             }
-
             $curl = curl_init($varnish);
             curl_setopt($curl, CURLOPT_HTTPHEADER, array($varnishHost));
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishCommand);
@@ -660,17 +585,15 @@ class VarnishCacheService extends Component
             if (curl_exec($curl) === false) {
                 \Craft::error('Purge Varnish Error: ' . var_dump(curl_error($curl)) . ', purgeUrl: ' . $purge . ', varnishUrl' . $varnish);
             }
-            \Craft::info('Purge Varnish response purgeUrl: ' . $purge . ', varnishUrl: ' . $varnish);
+            \Craft::debug('Purge Varnish response purgeUrl: ' . $purge . ', varnishUrl: ' . $varnish);
             curl_close($curl);
         }
         if (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
-            
             $zoneId = VarnishCache::getInstance()->getSettings()->cloudflareZone;
             $endpoint = "https://api.cloudflare.com/client/v4/zones/$zoneId";
             $apiKey = VarnishCache::getInstance()->getSettings()->cloudflareApi;
             $email = VarnishCache::getInstance()->getSettings()->cloudflareEmail;
             $ch = curl_init();
-
             curl_setopt($ch, CURLOPT_URL, $endpoint);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
@@ -679,40 +602,31 @@ class VarnishCacheService extends Component
                 "X-Auth-Key: $apiKey",
                 "Content-Type: application/json",
             ));
-
             $response = curl_exec($ch);
             if (curl_errno($ch)) {
                 \Craft::error("Cloudflare Curl error: " . curl_error($ch));
             } else {
                 $data = json_decode($response, true);
                 if ($data["success"]) {
-                    foreach ($data["result"] as $zone) {
-
-                            $purgeEndpoint = "$endpoint/$zone/purge_cache";
-                            $purgeParams = array(
-                                "files" => array($url),
-                            );
-
-                            $purgeJson = json_encode($purgeParams);
-                            curl_setopt($ch, CURLOPT_URL, $purgeEndpoint);
-                            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                            curl_setopt($ch, CURLOPT_POSTFIELDS, $purgeJson);
-                            $purgeResponse = curl_exec($ch);
-                            $purgeData = json_decode($purgeResponse, true);
-                            if ($purgeData["success"]) {
-                                \Craft::info("Cloudflare cache cleared for $url");
-                            } else {
-                                \Craft::error("Cloudflare cache purge failed: " . $purgeData["errors"][0]["message"]);
-                            }
-
-                            break;
-                        
+                    $purgeEndpoint = "$endpoint/purge_cache";
+                    $purgeParams = array(
+                        "files" => array($url),
+                    );
+                    $purgeJson = json_encode($purgeParams);
+                    curl_setopt($ch, CURLOPT_URL, $purgeEndpoint);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $purgeJson);
+                    $purgeResponse = curl_exec($ch);
+                    $purgeData = json_decode($purgeResponse, true);
+                    if ($purgeData["success"]) {
+                        \Craft::debug("Cloudflare cache cleared for $url");
+                    } else {
+                        \Craft::error("Cloudflare cache purge failed: " . $purgeData["errors"][0]["message"]);
                     }
                 } else {
                     \Craft::error("Cloudflare API request failed: " . $data["errors"][0]["message"]);
                 }
             }
-
             curl_close($ch);
         }
 

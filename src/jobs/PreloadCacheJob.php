@@ -24,56 +24,46 @@ class PreloadCacheJob extends BaseJob
     public function execute($queue): void
     {
         $startPreloadTime = microtime(true);
-
         $parsedUrl = parse_url($this->url);
         $path = $parsedUrl['path'] ?? '';
         $path = ltrim($path, '/');
-
-        // Preload the cache for the URL
         $ch = curl_init();
         $varnishHost = 'Host: ' . $_SERVER['SERVER_NAME'];
         curl_setopt($ch, CURLOPT_HTTPHEADER, array($varnishHost));
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-
         if (curl_exec($ch) === false) {
             $error = curl_error($ch);
             \Craft::error('Preload Error: ' . var_dump($error));
             throw new \Exception ('Failed to preload cache for URL: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
         } else {
-            \Craft::info('Preload - Successful for URL: ' . StringHelper::toString($this->url));
+            \Craft::debug('Preload - Successful for URL: ' . StringHelper::toString($this->url));
         }
-
         curl_close($ch);
         $cacheEntry = VarnishCachesRecord::findOne(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id]);
-
         $endPreloadTime = microtime(true);
         $preloadTime = $endPreloadTime - $startPreloadTime;
         if (empty($cacheEntry)) {
             \Craft::error('Error - No Preload Entry with Path: ' .StringHelper::toString($path));
         } else {
-            \Craft::info('Successful - Preload Entry with Path: ' . StringHelper::toString($path) . ', timeTaken: ' . StringHelper::toString($preloadTime) . ', id: ' . StringHelper::toString($cacheEntry->id) . ', uid: ' . StringHelper::toString($cacheEntry->uid));
+            \Craft::debug('Successful - Preload Entry with Path: ' . StringHelper::toString($path) . ', timeTaken: ' . StringHelper::toString($preloadTime) . ', id: ' . StringHelper::toString($cacheEntry->id) . ', uid: ' . StringHelper::toString($cacheEntry->uid));
             $cacheEntry->preloadTime = $preloadTime;
             $cacheEntry->save();
         }
         $startFirstLoadTime = microtime(true);
-
         $check = curl_init();
-
         curl_setopt($check, CURLOPT_HTTPHEADER, array($varnishHost));
         curl_setopt($check, CURLOPT_URL, $this->url);
         curl_setopt($check, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($check, CURLOPT_FOLLOWLOCATION, 1);
-
         if (curl_exec($check) === false) {
             $error = curl_error($check);
             \Craft::error('First Load of Cached Error: ' . StringHelper::toString($error));
             throw new \Exception ('Failed to First Load of Cached for URL: ' .  StringHelper::toString($this->url) . '. Error: ' .  StringHelper::toString($error));
         } else {
-            \Craft::info('First Load of Cached - Successful for URL: ' .  StringHelper::toString($this->url));
+            \Craft::debug('First Load of Cached - Successful for URL: ' .  StringHelper::toString($this->url));
         }
-
         curl_close($check);
         $endFirstLoadTime = microtime(true);
         $firstLoadTime = $endFirstLoadTime - $startFirstLoadTime;

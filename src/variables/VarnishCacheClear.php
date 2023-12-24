@@ -25,11 +25,11 @@ class VarnishCacheClear
 
     public function clearCustomUrlUriTimeout(string $uri, string $url, int $timeout)
     {
-        \Craft::info('clearCustomUrlUriTimeout single uri: ' . $uri . " , URL: " . $url);
+        \Craft::debug('clearCustomUrlUriTimeout single uri: ' . $uri . " , URL: " . $url);
 
         $v = new VarnishCacheService;
         $v->clearCacheCustomTimeout($uri, $url, $timeout);
-        \Craft::info('clearCustomUrlUriTimeout single URL ended');
+        \Craft::debug('clearCustomUrlUriTimeout single URL ended');
         return "";
 
     }

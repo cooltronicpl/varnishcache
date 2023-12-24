@@ -107,7 +107,7 @@ class CloudflareController extends Controller
             $status = $data['status'];
             $message = $data['message'];
             if ($status == 'success') {
-                Craft::info('Test Cloudflare connection - ' . StringHelper::toString($status) . '. Message: ' . StringHelper::toString($message));
+                Craft::debug('Test Cloudflare connection - ' . StringHelper::toString($status) . '. Message: ' . StringHelper::toString($message));
             } else {
                 Craft::error('Test Cloudflare connection - ' . StringHelper::toString($status) . '. Message: ' . StringHelper::toString($message));
             }

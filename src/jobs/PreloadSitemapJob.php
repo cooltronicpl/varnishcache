@@ -23,34 +23,28 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
     public function execute($queue): void
     {
         if (!$this->hasRun) {
-
             $this->hasRun = true;
             if (VarnishCache::getInstance()->getSettings()->resetQueue == true) {
                 $now = \Craft::$app->formatter->asDatetime(time());
                 $queue = \Yii::$app->queue;
             }
-            \Craft::info('Before Varnish Execution loop: "' . $now . '"');
-
-            // delete cache files and preload the cache from the sitemap
+            \Craft::debug('Before Varnish Execution loop: "' . $now . '"');
             $v = new VarnishCacheService;
             $v->clearCacheFiles();
             $v->preloadCacheFromSitemap();
             if (VarnishCache::getInstance()->getSettings()->cacheDuration) {
                 $duration = (VarnishCache::getInstance()->getSettings()->cacheDuration * 60);
-                \Craft::info('After Varnish Execution loop: "' . $duration . '"');
+                \Craft::debug('After Varnish Execution loop: "' . $duration . '"');
 
             } else {
                 $duration = 3600;
             }
             if (VarnishCache::getInstance()->getSettings()->resetQueue == true) {
-                // Delete tasks with the IDs of the tasks with the description
                 $taskIds = (new \craft\db\Query ())
                     ->select(['id'])
                     ->from('{{%queue}}')
                     ->where(['description' => 'Preloading CRON active'])
                     ->column();
-
-                // Release (delete) the tasks
                 foreach ($taskIds as $taskId) {
                     $queue->release($taskId);
                 }
@@ -58,8 +52,7 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
                 $this->hasRun = false;
                 $nextTask = QueueSingleton::getInstance();
                 $nextTask->push($job, 150, $duration, 1800);
-
-                \Craft::info('After Varnish Execution loop: "' . $now . '"');
+                \Craft::debug('After Varnish Execution loop: "' . $now . '"');
             }
         }
     }

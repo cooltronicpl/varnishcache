@@ -1,5 +1,20 @@
 # CDN Cache & Preload Changelog
 
+## 2.5.2 - 2023-12-24
+
+### Codename
+- Happy Christmas Eve from CoolTRONIC.pl LLC team
+
+### Changed 
+- Optimize plugin keywords in composer.json.
+- Change log severity from info to debug.
+
+### Fixed
+- Fix issue with double zone in URL when clearing Cloudflare zones.
+
+### Removed
+- Remove unnecessary alerts import from plugin settings panel.
+
 ## 2.5.1 - 2023-12-13
 
 ### Fixed

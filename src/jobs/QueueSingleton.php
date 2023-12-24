@@ -18,7 +18,7 @@ class QueueSingleton
 
     private function __construct()
     {
-        // Hide the constructor so that no one can create new instances of the queue
+
     }
     public static function getInstance()
     {

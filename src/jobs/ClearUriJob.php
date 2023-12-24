@@ -31,12 +31,12 @@ class ClearUriJob extends \craft\queue\BaseJob
     public function execute($queue): void
     {
         $cachesUri = VarnishCachesRecord::findAll(['uri' => $this->uri]);
-        \Craft::info('clearCustomUrlUriTimeout ids allUris "' . implode(", ", $cachesUri) . '"');
+        \Craft::debug('clearCustomUrlUriTimeout ids allUris "' . implode(", ", $cachesUri) . '"');
         $app = \Craft::$app;
         $baseUrl = $app->sites->getCurrentSite()->baseUrl;
         foreach ($cachesUri as $cache) {
             $file = $this->getCacheFileName($cache);
-            \Craft::info('clearCustomUrlUriTimeout file "' . $file . '"');
+            \Craft::debug('clearCustomUrlUriTimeout file "' . $file . '"');
 
             VarnishCacheService::clearVarnishUrl($baseUrl . $this->uri);
         }

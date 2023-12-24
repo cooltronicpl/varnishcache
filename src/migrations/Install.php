@@ -33,8 +33,6 @@ class Install extends Migration
     {
         $this->dropTableIfExists('{{%varnishcache_caches}}');
         $this->dropTableIfExists('{{%varnishcache_elements}}');
-        
-        // create table caches
         $columns = [
             'id' => $this->primaryKey(),
             'siteId' => $this->integer()->notNull(),
@@ -50,8 +48,6 @@ class Install extends Migration
         $this->createTable('{{%varnishcache_caches}}', $columns);
         $this->createIndex('varnishcache_caches_uri_siteId_idx', '{{%varnishcache_caches}}', ['uri', 'siteId'], true);
         $this->addForeignKey('varnishcache_caches_siteId_fk', '{{%varnishcache_caches}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');
-
-        // create table elements
         $columns = [
             'elementId' => $this->integer()->notNull(),
             'cacheId' => $this->integer()->notNull(),
