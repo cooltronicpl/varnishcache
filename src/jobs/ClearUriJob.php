@@ -8,7 +8,7 @@ namespace cooltronicpl\varnishcache\jobs;
  * CDN Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 
@@ -31,19 +31,15 @@ class ClearUriJob extends \craft\queue\BaseJob
     public function execute($queue): void
     {
         $cachesUri = VarnishCachesRecord::findAll(['uri' => $this->uri]);
-        \Craft::debug('clearCustomUrlUriTimeout ids allUris "' . implode(", ", $cachesUri) . '"');
+        \Craft::info('clearCustomUrlUriTimeout ids allUris "' . implode(", ", $cachesUri) . '"');
         $app = \Craft::$app;
         $baseUrl = $app->sites->getCurrentSite()->baseUrl;
         foreach ($cachesUri as $cache) {
             $file = $this->getCacheFileName($cache);
-            \Craft::debug('clearCustomUrlUriTimeout file "' . $file . '"');
-
-            VarnishCacheService::clearVarnishUrl($baseUrl . $this->uri);
+            \Craft::info('clearCustomUrlUriTimeout file "' . $file . '"');
+            VarnishCacheService::clearCacheUrl($baseUrl . $this->uri);
         }
-
-        VarnishCacheService::clearVarnishUrl($this->url);
-
-        // delete caches for related entry
+        VarnishCacheService::clearCacheUrl($this->url);
         VarnishCachesRecord::deleteAll(['uri' => $cachesUri]);
     }
 

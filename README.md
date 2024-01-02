@@ -1,6 +1,6 @@
-# CDN Cache & Preload Plugin for Craft CMS 4.x & 3.x
+# CDN Cache & Preload Plugin for Craft CMS 4.x & 3.x & 5.0.0.alpha
 
-With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish or Cloudflare cache, resulting in faster page load times and improved Core Web Vitals.
+With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish or/and Cloudflare cache, resulting in faster page load times and improved Core Web Vitals.
 
 ![Icon](resources/black.png#gh-light-mode-only)
 ![Icon](resources/white.png#gh-dark-mode-only)
@@ -41,8 +41,15 @@ With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching
 
 To install this plugin, copy the following command to your terminal:
 
-```
+```bash
+# go to project directory
+cd /path/to/project
+# Then tell Composer to require the plugin
 composer require cooltronicpl/varnishcache
+# tell Craft to install and enable the plugin
+./craft plugin/install varnishcache
+./craft plugin/enable varnishcache
+
 ```
 
 You can also install the plugin directly from the [Craft CMS plugin store](https://plugins.craftcms.com/varnishcache/).
@@ -53,7 +60,7 @@ This section provides detailed instructions and examples on how to use the CDN C
 
 ### Preloading Server Cache from Sitemap
 
-The preloading of the server cache from the sitemap is initiated once the settings in the plugin options are enabled. The plugin adds the target URLs from the sitemap to a queue for preloading. However, if CraftCMS 4 or 3 is not active, the next iteration of preload may be paused. After the next login to the admin panel, the preload cron will resume. This ensures that all your sites are continuously preloaded in the Varnish Server with PURGE and the static HTML Cache is recreated. For sites with long initial generation times, such as those generating PDFs with your plugin, the preload is initiated on the first website listed in the sitemap.xml. The duration between preloads can be adjusted from the default value of 60 minutes.
+The preloading of the server cache from the sitemap is initiated once the settings in the plugin options are enabled. The plugin adds the target URLs from the sitemap to a queue for preloading. However, if CraftCMS 4, 3, or 5 is not active, the next iteration of preload may be paused. After the next login to the admin panel, the preload cron will resume. This ensures that all your sites are continuously preloaded in the Varnish Server with PURGE and the static HTML Cache is recreated. For sites with long initial generation times, such as those generating PDFs with your plugin, the preload is initiated on the first website listed in the sitemap.xml. The duration between preloads can be adjusted from the default value of 60 minutes.
 
 ### Configuring Varnish Cache
 

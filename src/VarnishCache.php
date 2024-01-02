@@ -6,7 +6,7 @@
  * CDN Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 
@@ -38,7 +38,7 @@ use cooltronicpl\varnishcache\controller\CloudflareController;
 /**
  * 
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  * @package   VarnishCache
  * @since     1.0.0

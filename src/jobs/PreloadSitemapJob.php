@@ -5,7 +5,7 @@
  * CDN Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 namespace cooltronicpl\varnishcache\jobs;
@@ -28,13 +28,13 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
                 $now = \Craft::$app->formatter->asDatetime(time());
                 $queue = \Yii::$app->queue;
             }
-            \Craft::debug('Before Varnish Execution loop: "' . $now . '"');
+            \Craft::info('Before Varnish Execution loop: "' . $now . '"');
             $v = new VarnishCacheService;
             $v->clearCacheFiles();
             $v->preloadCacheFromSitemap();
             if (VarnishCache::getInstance()->getSettings()->cacheDuration) {
                 $duration = (VarnishCache::getInstance()->getSettings()->cacheDuration * 60);
-                \Craft::debug('After Varnish Execution loop: "' . $duration . '"');
+                \Craft::info('After Varnish Execution loop: "' . $duration . '"');
 
             } else {
                 $duration = 3600;
@@ -52,7 +52,7 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
                 $this->hasRun = false;
                 $nextTask = QueueSingleton::getInstance();
                 $nextTask->push($job, 150, $duration, 1800);
-                \Craft::debug('After Varnish Execution loop: "' . $now . '"');
+                \Craft::info('After Varnish Execution loop: "' . $now . '"');
             }
         }
     }

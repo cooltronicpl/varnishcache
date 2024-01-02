@@ -1,7 +1,7 @@
 {
     "pluginName": "CDN Cache & Preload",
     "pluginDescription": "Boost the performance of your site with Cloudflare.",
-    "pluginVersion": "2.5.2",
+    "pluginVersion": "2.6.0",
     "pluginAuthorName": "CoolTRONIC.pl sp. z o.o. (LLC)",
     "pluginVendorName": "cooltronicpl",
     "pluginAuthorUrl": "https://cooltronic.pl/",

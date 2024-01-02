@@ -160,6 +160,16 @@
     max: 99,
     errors: settings.getErrors('interval')
 }) }}
+			{{ forms.textField({
+    label: "Cache Preload Timeout (seconds)" | t,
+    id: 'timeout',
+    name: 'timeout',
+    instructions: "Set timeout of Preload requests"|t,
+    value: settings.timeout,
+    min: 2,
+    max: 99,
+    errors: settings.getErrors('timeout')
+}) }}
 			{{ forms.lightswitchField({
     label: 'Enable Global Queue Resetting' | t,
     id: 'resetQueue',
@@ -173,8 +183,8 @@
     id: 'runAll',
     name: 'runAll',
     instructions: 'Enable to disable Cache interval and preload all sitemap without any delays, that may require heavy server and use more resources' | t,
-    errors: settings.getErrors('resetQueue'),
-    on: settings.resetQueue
+    errors: settings.getErrors('runAll'),
+    on: settings.runAll
 }) }}
 		</div>
 
@@ -201,6 +211,45 @@
     errors: settings.getErrors('varnishBan'),
     on: settings.varnishBan
 }) }}
+			{{ forms.textField({
+    label: "Custom Purge URL for Varnish Clearing" | t,
+    id: 'customPurgeUrl',
+    name: 'customPurgeUrl',
+    instructions: "Set when Varnish Cache Purging is failing on Cloudflare (localhost) use in scheme `http://12.12.12.12/` or local network adress as `https://192.168.1.101` or domain like `https://some-purge-domain.com`."|t,
+    value: settings.customPurgeUrl,
+    errors: settings.getErrors('customPurgeUrl')
+}) }}
+			{{ forms.lightswitchField({
+    label: 'Change Varnish Cache Clearing `X-Purge-Method` methd to `urlmode`' | t,
+    id: 'customPurgeMethod',
+    name: 'customPurgeMethod',
+    instructions: 'Enable when failing on Clodflare' | t,
+    errors: settings.getErrors('customPurgeMethod'),
+    on: settings.customPurgeMethod
+}) }}
+
+<p>This is new method <code>X-Purge-Method</code> called <code>urlmode</code> which you must add into Varnish <code>/etc/varnish/default.vcl</code> file.</p>
+<pre>
+<code>
+sub vcl_recv {
+    if(req.method == "PURGE") {
+        if(!client.ip ~ purge) {
+            return(synth(405,"PURGE not allowed for this IP address"));
+        }
+        if (req.http.X-Purge-Method == "regex") {
+            ban("obj.http.x-url ~ " + req.url + " && obj.http.x-host == " + req.http.host);
+            return(synth(200, "Purged"));
+        }
+		<strong>if (req.http.X-Purge-Method == "urlmode") {
+            ban("obj.http.x-url ~ " + req.http.url + " && obj.http.x-host == " + req.http.host);
+            return(synth(200, "Purged"));
+        }</strong>
+        ban("obj.http.x-url == " + req.url + " && obj.http.x-host == " + req.http.host);
+        return(synth(200, "Purged"));
+    }
+}
+</code>
+</pre>
 		</div>
 
 

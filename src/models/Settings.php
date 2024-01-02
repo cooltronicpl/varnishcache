@@ -5,7 +5,7 @@
  * CDN Cache & Preload to static HTML Helper Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 
@@ -38,6 +38,10 @@ class Settings extends Model
     public $preloadAverage;
     public $firstLoadAverage;
     public $cacheRecords;
+    public $customPurgeUrl = null;
+    public $timeout = null;
+    public $customPurgeMethod = null;
+
     public function rules(): array
     {
         return [
@@ -59,6 +63,9 @@ class Settings extends Model
             [['cloudflareZone'], 'string'],
             [['cloudflareApi'], 'string'],
             [['cloudflareEmail'], 'string'],
+            [['timeout'], 'integer'],
+            [['enableVarnish'], 'boolean'],
+            [['customPurgeMethod'], 'boolean']
         ];
     }
 }

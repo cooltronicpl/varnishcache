@@ -15,7 +15,7 @@ use yii\web\UnauthorizedHttpException;
 /**
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  * @since     2.4.0
  *
@@ -107,7 +107,7 @@ class CloudflareController extends Controller
             $status = $data['status'];
             $message = $data['message'];
             if ($status == 'success') {
-                Craft::debug('Test Cloudflare connection - ' . StringHelper::toString($status) . '. Message: ' . StringHelper::toString($message));
+                Craft::info('Test Cloudflare connection - ' . StringHelper::toString($status) . '. Message: ' . StringHelper::toString($message));
             } else {
                 Craft::error('Test Cloudflare connection - ' . StringHelper::toString($status) . '. Message: ' . StringHelper::toString($message));
             }

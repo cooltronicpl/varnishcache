@@ -6,7 +6,7 @@
  * Varnish Cache Purge Plugin with http & htttps
  *
  * @link      https://cooltronic.pl
- * @copyright Copyright ( c ) 2023 CoolTRONIC.pl sp. z o.o.
+ * @copyright Copyright ( c ) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
  */
 
@@ -182,7 +182,7 @@ class VarnishCacheService extends Component
             }
             $file = $this->getCacheFileName($cacheEntry->uid);
             if (!$fp = fopen($file, 'w+')) {
-                \Craft::debug('HTML Cache could not write cache file "' . $file . '"');
+                \Craft::info('HTML Cache could not write cache file "' . $file . '"');
                 return;
             }
             fwrite($fp, $content);
@@ -193,7 +193,7 @@ class VarnishCacheService extends Component
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
 
         } else {
-            \Craft::debug('HTML Cache could not find cache entry for siteId: "' . $this->siteId . '" and uri: "' . $this->uri . '"');
+            \Craft::info('HTML Cache could not find cache entry for siteId: "' . $this->siteId . '" and uri: "' . $this->uri . '"');
         }
     }
 
@@ -230,16 +230,16 @@ class VarnishCacheService extends Component
         $cacheIds = array_map(function ($el) {
             return $el->cacheId;
         }, $elements);
-        \Craft::debug('clearCacheUri Purge ids "' . implode(", ", $cacheIds) . '"');
+        \Craft::info('clearCacheUri Purge ids "' . implode(", ", $cacheIds) . '"');
         $app = \Craft::$app;
 
         foreach ($cacheIds as $cache) {
             $file = $this->getCacheFileName($cache->uid);
-            \Craft::debug('clearCacheUri file "' . $file . '"');
+            \Craft::info('clearCacheUri file "' . $file . '"');
 
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
 
-            \Craft::debug('clearCacheUri Purge response: ' . $result . ' file: ' . $file);
+            \Craft::info('clearCacheUri Purge response: ' . $result . ' file: ' . $file);
 
             if (file_exists($file)) {
                 @unlink($file);
@@ -253,13 +253,13 @@ class VarnishCacheService extends Component
     {
 
         $cachesUri = VarnishCachesRecord::findAll(['uri' => $uri]);
-        \Craft::debug('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
+        \Craft::info('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
 
         $app = \Craft::$app;
 
         foreach ($cachesUri as $cache) {
             $file = $this->getCacheFileName($cache);
-            \Craft::debug('clearCacheCustom file "' . $file . '"');
+            \Craft::info('clearCacheCustom file "' . $file . '"');
 
             $this->clearCacheUrl($url);
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
@@ -289,14 +289,14 @@ class VarnishCacheService extends Component
     public function clearCacheFiles()
     {
         $cachesUri = VarnishCachesRecord::findAll([]);
-        \Craft::debug('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
+        \Craft::info('clearCacheCustom ids allUris "' . implode(", ", $cachesUri) . '"');
 
         $app = \Craft::$app;
         $baseUrl = $app->sites->getCurrentSite()->baseUrl;
 
         foreach ($cachesUri as $cache) {
             $file = $this->getCacheFileName($cache);
-            \Craft::debug('clearCacheCustom file "' . $file . '"');
+            \Craft::info('clearCacheCustom file "' . $file . '"');
 
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
 
@@ -424,7 +424,7 @@ class VarnishCacheService extends Component
                 $siteId = intval(next($exclude));
                 if ($path == $excludePath || preg_match('@' . $excludePath . '@', $path)) {
                     if ($requestedSiteId == $siteId || $siteId < 0) {
-                        \Craft::debug('Excluded: ' . $excludePath . ', ' . $path . " siteId: " . $requestedSiteId);
+                        \Craft::info('Excluded: ' . $excludePath . ', ' . $path . " siteId: " . $requestedSiteId);
                         return true;
                     }
                 }
@@ -501,7 +501,7 @@ class VarnishCacheService extends Component
                 $allUrls[] = $url;
             }
         }
-        \Craft::debug('Preload urls ' . implode(', ', $allUrls));
+        \Craft::info('Preload urls ' . implode(', ', $allUrls));
         $this->preloadCache($allUrls);
     }
 
@@ -564,28 +564,57 @@ class VarnishCacheService extends Component
     public function clearCacheUrl($url)
     {
         if (VarnishCache::getInstance()->getSettings()->enableVarnish == true) {
+
             $app = \Craft::$app;
             $baseUrl = $app->sites->getCurrentSite()->baseUrl;
             $parsedUrl = parse_url($url);
-
-            $purge = $parsedUrl['path'] ?? '';
-            $purge = ltrim($purge, '/');
-            $varnish = $baseUrl . $purge;
-            $varnishHost = 'Host: ' . $_SERVER['SERVER_NAME'];
-            if (VarnishCache::getInstance()->getSettings()->varnishBan == true) {
-                $varnishCommand = 'BAN';
+            $purgeurl = $parsedUrl['path'] ?? '';
+            $purgeurl = ltrim($purgeurl, '/');
+            if(VarnishCache::getInstance()->getSettings()->customPurgeMethod==true){
+                $purgemethod = "urlmode";            
+            }
+            else{
+                $purgemethod = "default";
+            }
+            $parsedUrl = parse_url($baseUrl);
+            $domainUrl = parse_url($baseUrl);
+            $domain = isset($domainUrl['host']) ? $domainUrl['host'] : '';
+            if (!empty(VarnishCache::getInstance()->getSettings()->customPurgeUrl)){
+                $varnishurl = VarnishCache::getInstance()->getSettings()->customPurgeUrl . $purgeurl;
+                $domainUrl = parse_url($varnishurl);
+                $domain = isset($domainUrl['host']) ? $domainUrl['host'] : '';
+            }
+            elseif (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
+                $varnishurl = 'http://localhost/' . $purgeurl;
             } else {
-                $varnishCommand = 'PURGE';
+                $varnishurl = $baseUrl . $purgeurl;
             }
-            $curl = curl_init($varnish);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array($varnishHost));
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishCommand);
-            curl_setopt($curl, CURLOPT_ENCODING, $varnishHost);
+
+            $varnishhost = 'Host: ' . $domain;
+            if (VarnishCache::getInstance()->getSettings()->varnishBan == true) {
+                $varnishcommand = 'BAN';
+            } else {
+                $varnishcommand = 'PURGE';
+            }
+            $curl = curl_init($varnishurl);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                'host' => $varnishhost,
+                'X-Purge-Method' => $purgemethod,
+                'url' => $url
+            ));
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishcommand);
+            curl_setopt($curl, CURLOPT_ENCODING, '');
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            if (curl_exec($curl) === false) {
-                \Craft::error('Purge Varnish Error: ' . var_dump(curl_error($curl)) . ', purgeUrl: ' . $purge . ', varnishUrl' . $varnish);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+            $result = curl_exec($curl);
+            if ($result === false) {
+                \Craft::error('Purge Varnish Error: ' . var_dump(curl_error($curl)) . ', purgeUrl: ' . $varnishurl . ', inputUrl: ' . $url);
+            } else {
+                $info = curl_getinfo($curl);
+                $code = $info['http_code'];
+                \Craft::info('Purge Varnish response purgeUrl: ' . $purgeurl . ', varnishUrl: ' . $varnishurl . ', inputUrl: ' . $url . ', http_code: ' . $code);
             }
-            \Craft::debug('Purge Varnish response purgeUrl: ' . $purge . ', varnishUrl: ' . $varnish);
             curl_close($curl);
         }
         if (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
@@ -593,10 +622,12 @@ class VarnishCacheService extends Component
             $endpoint = "https://api.cloudflare.com/client/v4/zones/$zoneId";
             $apiKey = VarnishCache::getInstance()->getSettings()->cloudflareApi;
             $email = VarnishCache::getInstance()->getSettings()->cloudflareEmail;
-            $ch = curl_init();
+            $ch = curl_init($endpoint);
+            curl_setopt($ch, CURLOPT_ENCODING, '');
             curl_setopt($ch, CURLOPT_URL, $endpoint);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                 "X-Auth-Email: $email",
                 "X-Auth-Key: $apiKey",
@@ -613,15 +644,23 @@ class VarnishCacheService extends Component
                         "files" => array($url),
                     );
                     $purgeJson = json_encode($purgeParams);
+                    $ch = curl_init($purgeEndpoint);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        "X-Auth-Email: $email",
+                        "X-Auth-Key: $apiKey",
+                        "Content-Type: application/json",
+                    ));
+                    curl_setopt($ch, CURLOPT_ENCODING, '');
                     curl_setopt($ch, CURLOPT_URL, $purgeEndpoint);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $purgeJson);
                     $purgeResponse = curl_exec($ch);
                     $purgeData = json_decode($purgeResponse, true);
                     if ($purgeData["success"]) {
-                        \Craft::debug("Cloudflare cache cleared for $url");
+                        \Craft::info("Cloudflare cache cleared for $url, response: " . $purgeResponse);
                     } else {
-                        \Craft::error("Cloudflare cache purge failed: " . $purgeData["errors"][0]["message"]);
+                        \Craft::error("Cloudflare cache purge failed: " . $purgeData["errors"][0]["message"] . "URL: ". $url );
                     }
                 } else {
                     \Craft::error("Cloudflare API request failed: " . $data["errors"][0]["message"]);

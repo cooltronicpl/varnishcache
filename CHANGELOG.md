@@ -1,4 +1,24 @@
-# CDN Cache & Preload Changelog
+# CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.0.0.alpha Changelog
+
+## 2.6.0 - 2024-01-02
+
+### Added
+- Configurable Varnish clearing domain and URL in Settings
+- Customizable timeout setting for Preloading in Settings
+- urlmode method to clear cache by URL header
+- Compatibility with `5.0.0.alpha`
+
+## Changed
+- Set Varnish clearing URL to http://localhost when using Cloudflare
+- Changed severity log level from debug to info
+- Disabled SSL verification for Varnish clearing URLs
+
+## Fixed
+- Fixed Varnish Server Cache clearing issues with Cloudflare
+- Fixed minor bugs related to Varnish Cache clearing
+
+## Codename
+- Happy New Year
 
 ## 2.5.2 - 2023-12-24
 
