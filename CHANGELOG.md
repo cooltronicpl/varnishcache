@@ -3,14 +3,14 @@
 ## 2.7.0 - 2024-01-08
 
 ### Fixed
-Preload issue for certain URLs
-Cache issue for certain URLs
+- Preload issue for certain URLs
+- Cache issue for certain URLs
 
 ### Improved
-HTML preload performance
+- HTML preload performance
 
 ### Codename
-Team CoolTRONIC.pl LLC wishes everyone a Merry Orthodox Christmas.
+- Team CoolTRONIC.pl LLC wishes everyone a Merry Orthodox Christmas.
 
 ## 2.6.0 - 2024-01-02
 
