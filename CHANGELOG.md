@@ -1,5 +1,17 @@
 # CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.0.0.alpha Changelog
 
+## 2.7.0 - 2024-01-08
+
+### Fixed
+Preload issue for certain URLs
+Cache issue for certain URLs
+
+### Improved
+HTML preload performance
+
+### Codename
+Team CoolTRONIC.pl LLC wishes everyone a Merry Orthodox Christmas.
+
 ## 2.6.0 - 2024-01-02
 
 ### Added

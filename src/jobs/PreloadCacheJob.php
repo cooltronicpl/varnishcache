@@ -9,11 +9,12 @@
  * @author    Pawel Potacki
  */
 namespace cooltronicpl\varnishcache\jobs;
+
 use cooltronicpl\varnishcache\records\VarnishCachesRecord;
+use cooltronicpl\varnishcache\VarnishCache;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
-use cooltronicpl\varnishcache\VarnishCache;
 
 class PreloadCacheJob extends BaseJob
 {
@@ -29,10 +30,12 @@ class PreloadCacheJob extends BaseJob
         $path = $parsedUrl['path'] ?? '';
         $path = ltrim($path, '/');
         $host = $parsedUrl['host'];
-        if (!empty(VarnishCache::getInstance()->getSettings()->timeout))
+        if (!empty(VarnishCache::getInstance()->getSettings()->timeout)) {
             $timeout = VarnishCache::getInstance()->getSettings()->timeout;
-        else
+        } else {
             $timeout = 20;
+        }
+
         $ch = curl_init($this->url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Host: ' . $host));
         curl_setopt($ch, CURLOPT_URL, $this->url);
@@ -43,7 +46,7 @@ class PreloadCacheJob extends BaseJob
         if (curl_exec($ch) === false) {
             $error = curl_error($ch);
             \Craft::error('Preload Error: ' . var_dump($error));
-            throw new \Exception ('Failed to preload cache for URL: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+            throw new \Exception('Failed to preload cache for URL: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
         } else {
             \Craft::info('Preload - Successful for URL: ' . StringHelper::toString($this->url));
         }
@@ -52,15 +55,52 @@ class PreloadCacheJob extends BaseJob
         $endPreloadTime = microtime(true);
         $preloadTime = $endPreloadTime - $startPreloadTime;
         if (empty($cacheEntry)) {
-            throw new \Exception ('Error - No Preload Entry with Path: ' .StringHelper::toString($path) . ' Failed to Preload of Cached for URL: ' .  StringHelper::toString($this->url));
+            $cacheEntryCreate = new VarnishCachesRecord(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id, 'createdAt' => date('Y-m-d H:i:s')]);
+            $cacheEntryCreate->save();
+            if ($cacheEntryCreate->hasErrors()) {
+                throw new \Exception('Failed to create entry in Preload: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+            }
+            $cacheEntry = VarnishCachesRecord::findOne(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id]);
+            $content = file_get_contents($this->url);
+            if (VarnishCache::getInstance()->getSettings()->optimizeContent) {
+                $content = str_replace(array("\r", "\n","           ", "      ","      ","    ","  ", "    "), ' ', $content);
+            }
+            $file = $this->getCacheFileName($cacheEntry->uid);
+            if (!$fp = fopen($file, 'w+')) {
+                \Craft::error('HTML Cache create in PreloadJob could not write as create new cache file "' . $file . '"');
+                return;
+            }
+            fwrite($fp, $content);
+            fclose($fp);
+            if ($cacheEntry->hasErrors()) {
+                throw new \Exception('Failed to update entry in Preload: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+            }
+            $ch = curl_init($this->url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Host: ' . $host));
+            curl_setopt($ch, CURLOPT_URL, $this->url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+            if (curl_exec($ch) === false) {
+                $error = curl_error($ch);
+                \Craft::error('Preload Error: ' . var_dump($error));
+                throw new \Exception('Failed to preload cache for URL: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+            } else {
+                \Craft::info('Preload - Successful for URL: ' . StringHelper::toString($this->url));
+            }
+            curl_close($ch);
+            $endPreloadTime = microtime(true);
+            $preloadTime = $endPreloadTime - $startPreloadTime;
+            \Craft::info('Double preload sucessful for URL: ' . StringHelper::toString($this->url));
+        }
+        if (empty($cacheEntry)) {
+            throw new \Exception('Failed to preload cache for URL, no cache entry: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
         } else {
-            \Craft::info('Successful - Preload Entry with Path: ' . StringHelper::toString($path) . ', timeTaken: ' . StringHelper::toString($preloadTime) . ', id: ' . StringHelper::toString($cacheEntry->id) . ', uid: ' . StringHelper::toString($cacheEntry->uid));
-            $cacheEntry->preloadTime = $preloadTime;
-            $cacheEntry->save();
+            \Craft::info('Preload - Cache entry exist: ' . StringHelper::toString($this->url) . ' filesize: ' . filesize($this->getCacheFileName($cacheEntry->uid)) . " filename: " . $this->getCacheFileName($cacheEntry->uid));
         }
         $startFirstLoadTime = microtime(true);
         $check = curl_init($this->url);
-        curl_setopt($check, CURLOPT_HTTPHEADER, array('Host: '.$host));
+        curl_setopt($check, CURLOPT_HTTPHEADER, array('Host: ' . $host));
         curl_setopt($check, CURLOPT_URL, $this->url);
         curl_setopt($check, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($check, CURLOPT_FOLLOWLOCATION, 1);
@@ -69,15 +109,17 @@ class PreloadCacheJob extends BaseJob
         if (curl_exec($check) === false) {
             $error = curl_error($check);
             \Craft::error('First Load of Cached Error: ' . StringHelper::toString($error));
-            throw new \Exception ('Failed to First Load of Cached for URL: ' .  StringHelper::toString($this->url) . '. Error: ' .  StringHelper::toString($error));
+            throw new \Exception('Failed to First Load of Cached for URL: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
         } else {
-            \Craft::info('First Load of Cached - Successful for URL: ' .  StringHelper::toString($this->url));
+            \Craft::info('First Load of Cached - Successful for URL: ' . StringHelper::toString($this->url));
         }
         curl_close($check);
         $endFirstLoadTime = microtime(true);
         $firstLoadTime = $endFirstLoadTime - $startFirstLoadTime;
-        if (!empty($cacheEntry)) {
+        if (!empty($cacheEntry)){
+            $cacheEntry->preloadTime = $preloadTime;
             $cacheEntry->firstLoadTime = $firstLoadTime;
+            $cacheEntry->cacheSize = filesize($this->getCacheFileName($cacheEntry->uid));
             $cacheEntry->save();
         }
     }
@@ -85,5 +127,34 @@ class PreloadCacheJob extends BaseJob
     protected function defaultDescription(): string
     {
         return 'Preloading cache for URL: ' . $this->url;
+    }
+
+    /**
+     * Get the filename path
+     *
+     * @param string $uid
+     * @return string
+     */
+
+    protected function getCacheFileName($uid)
+    {
+        return $this->getDirectory() . $uid . '.html';
+    }
+
+    /**
+     * Get the directory path
+     *
+     * @return string
+     */
+
+    private function getDirectory()
+    {
+        if (defined('CRAFT_STORAGE_PATH')) {
+            $basePath = CRAFT_STORAGE_PATH;
+        } else {
+            $basePath = CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . 'storage';
+        }
+
+        return $basePath . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'varnishcache' . DIRECTORY_SEPARATOR;
     }
 }

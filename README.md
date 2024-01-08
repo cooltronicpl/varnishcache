@@ -115,7 +115,7 @@ A: You can use the vcl file from [our project](https://github.com/cooltronicpl/-
 
 ### Q: Which branch should I install for my Craft CMS?
 
-A: The 2.x branch is suitable for Craft CMS 3 & 4 since 2.5.0, before that for Craft CMS 3.x it was used `craft3` branch with versions 1.x, whereas the 2.x branch is for Craft CMS 4.
+A: The versions since `2.6.0` is suitable for `3`, `4`, and `5.0.0.alpha`. Supporteed Craft CMS 3 & 4 since `2.5.0`, before that for Craft CMS 3.x it was used `craft3` branch with versions 1.x, whereas the 2.x branch is for Craft CMS 4.
 
 ### Q: My Preloading CRON failed. What could be the reason?
 

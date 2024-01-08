@@ -32,14 +32,10 @@ class VarnishCacheService extends Component
         $this->uri = \Craft::$app->request->getParam('p', '');
         $this->siteId = \Craft::$app->getSites()->getCurrentSite()->id;
         $this->settings = VarnishCache::getInstance()->getSettings();
-
-        // listen for the custom event and call the preloadCacheFromSitemap() function when the event is triggered
-
     }
 
     public function checkForCacheFile()
     {
-        // Bypass cache for live preview
         if (\Craft::$app->request->getQueryParam('x-craft-live-preview')) {
             return;
         }
@@ -54,7 +50,6 @@ class VarnishCacheService extends Component
             $file = $this->getCacheFileName($cacheEntry->uid);
 
             if (file_exists($file)) {
-                // Get the size of the cache file
                 $cacheEntry->cacheSize = filesize($file);
                 $cacheEntry->save();
                 if ($this->loadCache($file)) {
@@ -163,26 +158,51 @@ class VarnishCacheService extends Component
      */
     public function createCacheFile()
     {
-        // Check for live preview parameters
-        if (\Craft::$app->request->getQueryParam('x-craft-live-preview')) {
-            return;
+        $app = \Craft::$app;
+
+        switch (true) {
+            case ($app->request->getQueryParam('x-craft-live-preview')):
+                \Craft::info('HTML Cache Preview x-craft-live-preview: "' . $this->uri . '"');
+                return;
+            case (!$this->canCreateCacheFile() || http_response_code() !== 200):
+                \Craft::info('HTML Cache Preview canCreateCacheFile & http_response_code!=200: "' . $this->uri . '"');
+                return;
+            case (preg_match('/\badmin\b/i', $this->uri)):
+                \Craft::info('HTML Cache Preview /admin/"' . $this->uri . '"');
+                return;
+            case ($this->isPathExcluded()):
+                \Craft::info('HTML Cache Preview isPathExcluded: "' . $this->uri . '"');
+                return;
+            case ($this->isElementApiRoute()):
+                \Craft::info('HTML Cache Preview isElementApiRoute: "' . $this->uri . '"');
+                return;
+            case $app->request->getIsCpRequest():
+                \Craft::info('HTML Cache Preview $app->request->getIsCpRequest(): "' . $this->uri . '"');
+                return;
+            case $app->request->getIsActionRequest():
+                \Craft::info('HTML Cache Preview $app->request->getIsActionRequest(): "' . $this->uri . '"');
+                return;
+            case $app->request->getIsLivePreview():
+                \Craft::info('HTML Cache Preview $app->request->getIsLivePreview(): "' . $this->uri . '"');
+                return;
+            case !$app->request->getIsGet():
+                \Craft::info('HTML Cache Preview !$app->request->getIsGet(): "' . $this->uri . '"');
+                return;
+            case $app->request->getIsAjax():
+                \Craft::info('HTML Cache Preview $app->request->getIsAjax(): "' . $this->uri . '"');
+                return;
         }
-        if (!$this->canCreateCacheFile() || http_response_code() !== 200) {
-            return;
-        }
-        if (preg_match('/\badmin\b/i', $this->uri)) {
-            return;
-        }
+
         $cacheEntry = VarnishCachesRecord::findOne(['uri' => $this->uri, 'siteId' => $this->siteId]);
 
         if ($cacheEntry) {
             $content = ob_get_contents();
             if ($this->settings->optimizeContent) {
-                $content = implode("\n", array_map('trim', explode("\n", $content)));
+                $content = str_replace(array("\r", "\n","           ", "      ","      ","    ","  ", "    "), ' ', $content);
             }
             $file = $this->getCacheFileName($cacheEntry->uid);
             if (!$fp = fopen($file, 'w+')) {
-                \Craft::info('HTML Cache could not write cache file "' . $file . '"');
+                \Craft::error('HTML Cache could not write cache file "' . $file . '"');
                 return;
             }
             fwrite($fp, $content);
@@ -191,9 +211,9 @@ class VarnishCacheService extends Component
             $cacheEntry->save();
             $app = \Craft::$app;
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
-
-        } else {
-            \Craft::info('HTML Cache could not find cache entry for siteId: "' . $this->siteId . '" and uri: "' . $this->uri . '"');
+        } else
+        {
+            \Craft::error('HTML Cache could not find cache entry for siteId: "' . $this->siteId . '" and uri: "' . $this->uri . '"');
         }
     }
 
@@ -570,21 +590,19 @@ class VarnishCacheService extends Component
             $parsedUrl = parse_url($url);
             $purgeurl = $parsedUrl['path'] ?? '';
             $purgeurl = ltrim($purgeurl, '/');
-            if(VarnishCache::getInstance()->getSettings()->customPurgeMethod==true){
-                $purgemethod = "urlmode";            
-            }
-            else{
+            if (VarnishCache::getInstance()->getSettings()->customPurgeMethod == true) {
+                $purgemethod = "urlmode";
+            } else {
                 $purgemethod = "default";
             }
             $parsedUrl = parse_url($baseUrl);
             $domainUrl = parse_url($baseUrl);
             $domain = isset($domainUrl['host']) ? $domainUrl['host'] : '';
-            if (!empty(VarnishCache::getInstance()->getSettings()->customPurgeUrl)){
+            if (!empty(VarnishCache::getInstance()->getSettings()->customPurgeUrl)) {
                 $varnishurl = VarnishCache::getInstance()->getSettings()->customPurgeUrl . $purgeurl;
                 $domainUrl = parse_url($varnishurl);
                 $domain = isset($domainUrl['host']) ? $domainUrl['host'] : '';
-            }
-            elseif (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
+            } elseif (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
                 $varnishurl = 'http://localhost/' . $purgeurl;
             } else {
                 $varnishurl = $baseUrl . $purgeurl;
@@ -600,7 +618,7 @@ class VarnishCacheService extends Component
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
                 'host' => $varnishhost,
                 'X-Purge-Method' => $purgemethod,
-                'url' => $url
+                'url' => $url,
             ));
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $varnishcommand);
             curl_setopt($curl, CURLOPT_ENCODING, '');
@@ -660,7 +678,7 @@ class VarnishCacheService extends Component
                     if ($purgeData["success"]) {
                         \Craft::info("Cloudflare cache cleared for $url, response: " . $purgeResponse);
                     } else {
-                        \Craft::error("Cloudflare cache purge failed: " . $purgeData["errors"][0]["message"] . "URL: ". $url );
+                        \Craft::error("Cloudflare cache purge failed: " . $purgeData["errors"][0]["message"] . "URL: " . $url);
                     }
                 } else {
                     \Craft::error("Cloudflare API request failed: " . $data["errors"][0]["message"]);
