@@ -58,16 +58,16 @@ class PreloadCacheJob extends BaseJob
             $cacheEntryCreate = new VarnishCachesRecord(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id, 'createdAt' => date('Y-m-d H:i:s')]);
             $cacheEntryCreate->save();
             if ($cacheEntryCreate->hasErrors()) {
-                throw new \Exception('Failed to create entry in Preload: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+                throw new \Exception('Failed to create entry in Preload Cache Entry workaround: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
             }
             $cacheEntry = VarnishCachesRecord::findOne(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id]);
             $content = file_get_contents($this->url);
             if (VarnishCache::getInstance()->getSettings()->optimizeContent) {
-                $content = str_replace(array("\r", "\n","           ", "      ","      ","    ","  ", "    "), ' ', $content);
+                $content = str_replace(array("\r", "\n", "           ", "      ", "      ", "    ", "  ", "    "), ' ', $content);
             }
             $file = $this->getCacheFileName($cacheEntry->uid);
             if (!$fp = fopen($file, 'w+')) {
-                \Craft::error('HTML Cache create in PreloadJob could not write as create new cache file "' . $file . '"');
+                \Craft::error('HTML Cache create in PreloadJob Cache Entry workaround could not write as create new cache file "' . $file . '"');
                 return;
             }
             fwrite($fp, $content);
@@ -75,6 +75,8 @@ class PreloadCacheJob extends BaseJob
             if ($cacheEntry->hasErrors()) {
                 throw new \Exception('Failed to update entry in Preload: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
             }
+            $v = new \cooltronicpl\varnishcache\services\VarnishCacheService();
+            $v->clearCacheUrl($this->url);
             $ch = curl_init($this->url);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Host: ' . $host));
             curl_setopt($ch, CURLOPT_URL, $this->url);
@@ -86,17 +88,17 @@ class PreloadCacheJob extends BaseJob
                 \Craft::error('Preload Error: ' . var_dump($error));
                 throw new \Exception('Failed to preload cache for URL: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
             } else {
-                \Craft::info('Preload - Successful for URL: ' . StringHelper::toString($this->url));
+                \Craft::info('Preload - Cache Entry workaround - Successful for URL: ' . StringHelper::toString($this->url));
             }
             curl_close($ch);
             $endPreloadTime = microtime(true);
             $preloadTime = $endPreloadTime - $startPreloadTime;
-            \Craft::info('Double preload sucessful for URL: ' . StringHelper::toString($this->url));
+            \Craft::info('Cache Entry workaround preload sucessful for URL: ' . StringHelper::toString($this->url));
         }
         if (empty($cacheEntry)) {
-            throw new \Exception('Failed to preload cache for URL, no cache entry: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+            throw new \Exception('Failed to preload Cache Entry workaround for URL, no cache entry: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
         } else {
-            \Craft::info('Preload - Cache entry exist: ' . StringHelper::toString($this->url) . ' filesize: ' . filesize($this->getCacheFileName($cacheEntry->uid)) . " filename: " . $this->getCacheFileName($cacheEntry->uid));
+            \Craft::info('Preload - Cache Entry exist: ' . StringHelper::toString($this->url) . ' filesize: ' . filesize($this->getCacheFileName($cacheEntry->uid)) . " filename: " . $this->getCacheFileName($cacheEntry->uid));
         }
         $startFirstLoadTime = microtime(true);
         $check = curl_init($this->url);
@@ -116,7 +118,7 @@ class PreloadCacheJob extends BaseJob
         curl_close($check);
         $endFirstLoadTime = microtime(true);
         $firstLoadTime = $endFirstLoadTime - $startFirstLoadTime;
-        if (!empty($cacheEntry)){
+        if (!empty($cacheEntry)) {
             $cacheEntry->preloadTime = $preloadTime;
             $cacheEntry->firstLoadTime = $firstLoadTime;
             $cacheEntry->cacheSize = filesize($this->getCacheFileName($cacheEntry->uid));

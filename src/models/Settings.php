@@ -65,7 +65,7 @@ class Settings extends Model
             [['cloudflareEmail'], 'string'],
             [['timeout'], 'integer'],
             [['enableVarnish'], 'boolean'],
-            [['customPurgeMethod'], 'boolean']
+            [['customPurgeMethod'], 'boolean'],
         ];
     }
 }

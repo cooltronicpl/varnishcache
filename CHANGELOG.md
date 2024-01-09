@@ -1,16 +1,25 @@
 # CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.0.0.alpha Changelog
 
+## 2.7.1 - 2024-01-09
+
+### Fixed
+- Fixed cache issue by clearing cache after preload workaround in PreloadCacheJob (introduced in 2.7.0)
+- Formatted classes and twig code
+
+### Codename
+- Happy #PlayGodDay
+
 ## 2.7.0 - 2024-01-08
 
 ### Fixed
-- Preload issue for certain URLs
-- Cache issue for certain URLs
+- Fixed preload issue for certain URLs by adding a fallback mechanism
+- Fixed unnecessary cache issue for certain URLs
 
 ### Improved
-- HTML preload performance
+- HTML preload performance and stability
 
 ### Codename
-- Team CoolTRONIC.pl LLC wishes everyone a Merry Orthodox Christmas.
+- Team CoolTRONIC.pl LLC wishes everyone a Merry Orthodox Christmas
 
 ## 2.6.0 - 2024-01-02
 

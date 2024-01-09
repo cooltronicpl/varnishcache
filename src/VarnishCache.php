@@ -12,7 +12,7 @@
 
 namespace cooltronicpl\varnishcache;
 
-use cooltronicpl\varnishcache\controllers\VarnishCacheController;
+use cooltronicpl\varnishcache\controller\CloudflareController;
 use cooltronicpl\varnishcache\jobs\PreloadSitemapJob;
 use cooltronicpl\varnishcache\jobs\QueueSingleton;
 use cooltronicpl\varnishcache\models\Settings;
@@ -24,6 +24,7 @@ use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
 use craft\elements\GlobalSet;
 use craft\elements\User;
+use craft\events\ElementEvent;
 use craft\events\PluginEvent;
 use craft\helpers\FileHelper;
 use craft\services\Elements;
@@ -31,12 +32,9 @@ use craft\services\Plugins;
 use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
-use craft\elements\Entry;
-use craft\events\ElementEvent;
-use cooltronicpl\varnishcache\controller\CloudflareController;
 
 /**
- * 
+ *
  * @link      https://cooltronic.pl
  * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o.
  * @author    Pawel Potacki
@@ -263,7 +261,7 @@ class VarnishCache extends Plugin
                     }
                     if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
                         // If the event element is an Entry (a page)
-                        if ($event->element instanceof \craft\elements\Entry ) {
+                        if ($event->element instanceof \craft\elements\Entry) {
                             // Create a new PreloadSitemapJob
                             $job = new PreloadSitemapJob();
                             // Push the job to the queue
@@ -278,7 +276,7 @@ class VarnishCache extends Plugin
             Elements::class,
             Elements::EVENT_AFTER_SAVE_ELEMENT,
             function (ElementEvent $event) {
-                if ($event->element instanceof \craft\elements\Entry ) {
+                if ($event->element instanceof \craft\elements\Entry) {
                     // Check if the preloadSitemap setting of the VarnishCache instance is set to '1'
                     if (VarnishCache::getInstance()->getSettings()->purgeCache === '1') {
                         $this->VarnishCacheService->clearCacheFiles();
@@ -294,7 +292,7 @@ class VarnishCache extends Plugin
             }
         );
 
-		Event::on(
+        Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
             function (Event $event) {

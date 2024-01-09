@@ -198,7 +198,7 @@ class VarnishCacheService extends Component
         if ($cacheEntry) {
             $content = ob_get_contents();
             if ($this->settings->optimizeContent) {
-                $content = str_replace(array("\r", "\n","           ", "      ","      ","    ","  ", "    "), ' ', $content);
+                $content = str_replace(array("\r", "\n", "           ", "      ", "      ", "    ", "  ", "    "), ' ', $content);
             }
             $file = $this->getCacheFileName($cacheEntry->uid);
             if (!$fp = fopen($file, 'w+')) {
@@ -211,8 +211,7 @@ class VarnishCacheService extends Component
             $cacheEntry->save();
             $app = \Craft::$app;
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
-        } else
-        {
+        } else {
             \Craft::error('HTML Cache could not find cache entry for siteId: "' . $this->siteId . '" and uri: "' . $this->uri . '"');
         }
     }

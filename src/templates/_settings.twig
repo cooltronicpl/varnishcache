@@ -228,8 +228,14 @@
     on: settings.customPurgeMethod
 }) }}
 
-<p>This is new method <code>X-Purge-Method</code> called <code>urlmode</code> which you must add into Varnish <code>/etc/varnish/default.vcl</code> file.</p>
-<pre>
+			<p>This is new method
+				<code>X-Purge-Method</code>
+				called
+				<code>urlmode</code>
+				which you must add into Varnish
+				<code>/etc/varnish/default.vcl</code>
+				file.</p>
+			<pre>
 <code>
 sub vcl_recv {
     if(req.method == "PURGE") {

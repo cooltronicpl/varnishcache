@@ -40,7 +40,7 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
                 $duration = 3600;
             }
             if (VarnishCache::getInstance()->getSettings()->resetQueue == true) {
-                $taskIds = (new \craft\db\Query ())
+                $taskIds = (new \craft\db\Query())
                     ->select(['id'])
                     ->from('{{%queue}}')
                     ->where(['description' => 'Preloading CRON active'])
