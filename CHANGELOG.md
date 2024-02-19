@@ -1,59 +1,86 @@
 # CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.0.0.alpha Changelog
 
+## 2.7.2 - 2024-02-19
+
+### Added
+
+- Support for Craft CMS `5.0.0-beta` and later versions.
+
+### Fixed
+
+- A bug that prevented accessing plugin settings in Craft CMS `5.0.0-beta`.
+
+### Codename
+
+- Washington’s Birthday
+
 ## 2.7.1 - 2024-01-09
 
 ### Fixed
+
 - Fixed cache issue by clearing cache after preload workaround in PreloadCacheJob (introduced in 2.7.0)
-- Formatted classes and twig code
+- Reformatted classes and twig code
 
 ### Codename
+
 - Happy #PlayGodDay
 
 ## 2.7.0 - 2024-01-08
 
 ### Fixed
+
 - Fixed preload issue for certain URLs by adding a fallback mechanism
 - Fixed unnecessary cache issue for certain URLs
 
 ### Improved
+
 - HTML preload performance and stability
 
 ### Codename
+
 - Team CoolTRONIC.pl LLC wishes everyone a Merry Orthodox Christmas
 
 ## 2.6.0 - 2024-01-02
 
 ### Added
+
 - Configurable Varnish clearing domain and URL in Settings
 - Customizable timeout setting for Preloading in Settings
 - urlmode method to clear cache by URL header
 - Compatibility with `5.0.0.alpha`
 
 ## Changed
+
 - Set Varnish clearing URL to http://localhost when using Cloudflare
 - Changed severity log level from debug to info
 - Disabled SSL verification for Varnish clearing URLs
 
 ## Fixed
+
 - Fixed Varnish Server Cache clearing issues with Cloudflare
 - Fixed minor bugs related to Varnish Cache clearing
 
 ## Codename
+
 - Happy New Year
 
 ## 2.5.2 - 2023-12-24
 
 ### Codename
+
 - Happy Christmas Eve from CoolTRONIC.pl LLC team
 
 ### Changed 
+
 - Optimize plugin keywords in composer.json.
 - Change log severity from info to debug.
 
 ### Fixed
+
 - Fix issue with double zone in URL when clearing Cloudflare zones.
 
 ### Removed
+
 - Remove unnecessary alerts import from plugin settings panel.
 
 ## 2.5.1 - 2023-12-13

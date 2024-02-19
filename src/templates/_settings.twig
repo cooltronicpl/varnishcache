@@ -333,23 +333,18 @@ sub vcl_recv {
 	{# Write your JavaScript #}
 	<script>
 		$(document).ready(function () { // Hide all tab content divs by default
-$('.tab-content').hide();
-
-// Show the first tab content div
-$('.tab-content:first').show();
-
-// When a tab is clicked
-$('.scrollable a').click(function () { // Get the ID of the tab
-
-var tabId = $(this).attr('id').replace('settings-tab-', '');
-// Hide all tab content divs
-$('.tab-content').hide();
-
-// Show the clicked tab's content div and select current tab
-$('#settings-content-' + tabId).show();
-$('.sel').removeClass('sel');
-$(this).addClass('sel');
-});
+        $('.tab-content').hide();
+												                    
+		$('.tab-content:first').show();												                    
+	    $('.scrollable a').click(function () {
+	        var tabId = $(this).attr('id').replace('settings-tab-', '');
+            var tabId5B = $(this).attr('id').replace('settings-tab-settings-', '');
+	        $('.tab-content').hide();
+	        $('#settings-content-' + tabId).show();
+   	        $('#settings-content-' + tabId5B).show();
+	        $('.sel').removeClass('sel');
+	        $(this).addClass('sel');
+	});
 });
 	</script>
 {% endblock %}
