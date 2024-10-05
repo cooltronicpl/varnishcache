@@ -12,7 +12,7 @@ namespace cooltronicpl\varnishcache\jobs;
 
 use cooltronicpl\varnishcache\jobs\QueueSingleton;
 use cooltronicpl\varnishcache\services\VarnishCacheService;
-use cooltronicpl\varnishcache\VarnishCache;
+use Craft;
 
 class PreloadSitemapJob extends \craft\queue\BaseJob
 
@@ -24,7 +24,9 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
     {
         if (!$this->hasRun) {
             $this->hasRun = true;
-            if (VarnishCache::getInstance()->getSettings()->resetQueue == true) {
+            $plugin = Craft::$app->plugins->getPlugin('varnishcache');
+            $now = 0;
+            if ($plugin->getSettings()->resetQueue == true) {
                 $now = \Craft::$app->formatter->asDatetime(time());
                 $queue = \Yii::$app->queue;
             }
@@ -32,14 +34,15 @@ class PreloadSitemapJob extends \craft\queue\BaseJob
             $v = new VarnishCacheService;
             $v->clearCacheFiles();
             $v->preloadCacheFromSitemap();
-            if (VarnishCache::getInstance()->getSettings()->cacheDuration) {
-                $duration = (VarnishCache::getInstance()->getSettings()->cacheDuration * 60);
+
+            if ($plugin->getSettings()->cacheDuration) {
+                $duration = ($plugin->getSettings()->cacheDuration * 60);
                 \Craft::info('After Varnish Execution loop: "' . $duration . '"');
 
             } else {
                 $duration = 3600;
             }
-            if (VarnishCache::getInstance()->getSettings()->resetQueue == true) {
+            if ($plugin->getSettings()->resetQueue == true) {
                 $taskIds = (new \craft\db\Query())
                     ->select(['id'])
                     ->from('{{%queue}}')

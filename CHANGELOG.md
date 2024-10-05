@@ -1,5 +1,19 @@
 # CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.0.0.alpha Changelog
 
+## 3.0.0 - 2024-10-05
+
+### Added
+
+- Support for Craft CMS `5.0` and later versions.
+
+### Fixed
+
+- A bug that prevented accessing plugin settings in internal plugin code in `5.0`.
+
+### Codename
+
+- Autumnal Equinox
+
 ## 2.7.2 - 2024-02-19
 
 ### Added

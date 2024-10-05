@@ -1,7 +1,6 @@
 <?php
 namespace cooltronicpl\varnishcache\controller;
 
-use cooltronicpl\varnishcache\VarnishCache;
 use Craft;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
@@ -60,9 +59,11 @@ class CloudflareController extends Controller
 
     private function testCloudflare()
     {
-        $zone = VarnishCache::getInstance()->getSettings()->cloudflareZone;
-        $api_key = VarnishCache::getInstance()->getSettings()->cloudflareApi;
-        $email = VarnishCache::getInstance()->getSettings()->cloudflareEmail;
+        $plugin = Craft::$app->plugins->getPlugin('varnishcache');
+
+        $zone = $plugin->getSettings()->cloudflareZone;
+        $api_key = $plugin->getSettings()->cloudflareApi;
+        $email = $plugin->getSettings()->cloudflareEmail;
 
         // Define the Cloudflare API endpoint
         $endpoint = "https://api.cloudflare.com/client/v4/zones/" . $zone;

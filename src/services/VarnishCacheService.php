@@ -582,14 +582,14 @@ class VarnishCacheService extends Component
 
     public function clearCacheUrl($url)
     {
-        if (VarnishCache::getInstance()->getSettings()->enableVarnish == true) {
+        if ($this->settings->enableVarnish == true) {
 
             $app = \Craft::$app;
             $baseUrl = $app->sites->getCurrentSite()->baseUrl;
             $parsedUrl = parse_url($url);
             $purgeurl = $parsedUrl['path'] ?? '';
             $purgeurl = ltrim($purgeurl, '/');
-            if (VarnishCache::getInstance()->getSettings()->customPurgeMethod == true) {
+            if ($this->settings->customPurgeMethod == true) {
                 $purgemethod = "urlmode";
             } else {
                 $purgemethod = "default";
@@ -597,18 +597,18 @@ class VarnishCacheService extends Component
             $parsedUrl = parse_url($baseUrl);
             $domainUrl = parse_url($baseUrl);
             $domain = isset($domainUrl['host']) ? $domainUrl['host'] : '';
-            if (!empty(VarnishCache::getInstance()->getSettings()->customPurgeUrl)) {
-                $varnishurl = VarnishCache::getInstance()->getSettings()->customPurgeUrl . $purgeurl;
+            if (!empty($this->settings->customPurgeUrl)) {
+                $varnishurl = $this->settings->customPurgeUrl . $purgeurl;
                 $domainUrl = parse_url($varnishurl);
                 $domain = isset($domainUrl['host']) ? $domainUrl['host'] : '';
-            } elseif (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
+            } elseif ($this->settings->enableCloudflare == true) {
                 $varnishurl = 'http://localhost/' . $purgeurl;
             } else {
                 $varnishurl = $baseUrl . $purgeurl;
             }
 
             $varnishhost = 'Host: ' . $domain;
-            if (VarnishCache::getInstance()->getSettings()->varnishBan == true) {
+            if ($this->settings->varnishBan == true) {
                 $varnishcommand = 'BAN';
             } else {
                 $varnishcommand = 'PURGE';
@@ -634,11 +634,11 @@ class VarnishCacheService extends Component
             }
             curl_close($curl);
         }
-        if (VarnishCache::getInstance()->getSettings()->enableCloudflare == true) {
-            $zoneId = VarnishCache::getInstance()->getSettings()->cloudflareZone;
+        if ($this->settings->enableCloudflare == true) {
+            $zoneId = $this->settings->cloudflareZone;
             $endpoint = "https://api.cloudflare.com/client/v4/zones/$zoneId";
-            $apiKey = VarnishCache::getInstance()->getSettings()->cloudflareApi;
-            $email = VarnishCache::getInstance()->getSettings()->cloudflareEmail;
+            $apiKey = $this->settings->cloudflareApi;
+            $email = $this->settings->cloudflareEmail;
             $ch = curl_init($endpoint);
             curl_setopt($ch, CURLOPT_ENCODING, '');
             curl_setopt($ch, CURLOPT_URL, $endpoint);

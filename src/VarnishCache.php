@@ -20,6 +20,7 @@ use cooltronicpl\varnishcache\records\VarnishCacheElementRecord;
 use cooltronicpl\varnishcache\records\VarnishCachesRecord;
 use cooltronicpl\varnishcache\services\VarnishCacheService;
 use cooltronicpl\varnishcache\variables\VarnishCacheClear;
+use Craft;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
 use craft\elements\GlobalSet;
@@ -240,7 +241,9 @@ class VarnishCache extends Plugin
             Plugins::EVENT_AFTER_SAVE_PLUGIN_SETTINGS,
             function (PluginEvent $event) {
                 if ($event->plugin === $this) {
-                    if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
+                    $plugin = Craft::$app->plugins->getPlugin('varnishcache');
+
+                    if ($plugin->getSettings()->preloadSitemap === '1') {
                         $job = new PreloadSitemapJob();
                         if ($job->isRun() == false) {
                             QueueSingleton::getInstance($job)->push($job, 150, 0, 1800);
@@ -256,10 +259,10 @@ class VarnishCache extends Plugin
             Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
             function (ElementEvent $event) {
                 if ($event->element === $this) {
-                    if (VarnishCache::getInstance()->getSettings()->purgeCache === '1') {
+                    if ($plugin->getSettings()->purgeCache === '1') {
                         $this->VarnishCacheService->clearCacheFiles();
                     }
-                    if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
+                    if ($plugin->getSettings()->preloadSitemap === '1') {
                         // If the event element is an Entry (a page)
                         if ($event->element instanceof \craft\elements\Entry) {
                             // Create a new PreloadSitemapJob
@@ -277,11 +280,13 @@ class VarnishCache extends Plugin
             Elements::EVENT_AFTER_SAVE_ELEMENT,
             function (ElementEvent $event) {
                 if ($event->element instanceof \craft\elements\Entry) {
+                    $plugin = Craft::$app->plugins->getPlugin('varnishcache');
+
                     // Check if the preloadSitemap setting of the VarnishCache instance is set to '1'
-                    if (VarnishCache::getInstance()->getSettings()->purgeCache === '1') {
+                    if ($plugin->getSettings()->purgeCache === '1') {
                         $this->VarnishCacheService->clearCacheFiles();
                     }
-                    if (VarnishCache::getInstance()->getSettings()->preloadSitemap === '1') {
+                    if ($plugin->getSettings()->preloadSitemap === '1') {
                         // If the event element is an Entry (a page)
                         // Create a new PreloadSitemapJob
                         $job = new PreloadSitemapJob();

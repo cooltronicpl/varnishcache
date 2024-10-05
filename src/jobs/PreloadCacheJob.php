@@ -11,7 +11,7 @@
 namespace cooltronicpl\varnishcache\jobs;
 
 use cooltronicpl\varnishcache\records\VarnishCachesRecord;
-use cooltronicpl\varnishcache\VarnishCache;
+use Craft;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
@@ -25,13 +25,15 @@ class PreloadCacheJob extends BaseJob
      */
     public function execute($queue): void
     {
+        $plugin = Craft::$app->plugins->getPlugin('varnishcache');
+
         $startPreloadTime = microtime(true);
         $parsedUrl = parse_url($this->url);
         $path = $parsedUrl['path'] ?? '';
         $path = ltrim($path, '/');
         $host = $parsedUrl['host'];
-        if (!empty(VarnishCache::getInstance()->getSettings()->timeout)) {
-            $timeout = VarnishCache::getInstance()->getSettings()->timeout;
+        if (!empty($plugin->getSettings()->timeout)) {
+            $timeout = $plugin->getSettings()->timeout;
         } else {
             $timeout = 20;
         }
@@ -62,7 +64,7 @@ class PreloadCacheJob extends BaseJob
             }
             $cacheEntry = VarnishCachesRecord::findOne(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id]);
             $content = file_get_contents($this->url);
-            if (VarnishCache::getInstance()->getSettings()->optimizeContent) {
+            if ($plugin->getSettings()->optimizeContent) {
                 $content = str_replace(array("\r", "\n", "           ", "      ", "      ", "    ", "  ", "    "), ' ', $content);
             }
             $file = $this->getCacheFileName($cacheEntry->uid);
