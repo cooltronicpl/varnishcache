@@ -1,4 +1,4 @@
-# CDN Cache & Preload Plugin for Craft CMS 4.x & 3.x & 5.0.0.alpha
+# CDN Cache & Preload Plugin for Craft CMS 4.x & 3.x & 5.x
 
 With ❤️ [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) presents a caching helper solution written by [Pawel Potacki](https://potacki.com). This plugin generates static HTML files from your dynamic CMS projects and purges the Varnish or/and Cloudflare cache, resulting in faster page load times and improved Core Web Vitals.
 
@@ -115,7 +115,7 @@ A: You can use the vcl file from [our project](https://github.com/cooltronicpl/-
 
 ### Q: Which branch should I install for my Craft CMS?
 
-A: The versions since `2.6.0` is suitable for `3`, `4`, and `5.0.0.alpha`. Supporteed Craft CMS 3 & 4 since `2.5.0`, before that for Craft CMS 3.x it was used `craft3` branch with versions 1.x, whereas the 2.x branch is for Craft CMS 4.
+A: From plugin version `3.0` CraftCMS `5.x` is supported. Deprecated code is fixed for installation after `5.4` in `3.1` version of plugin. The versions since `2.6.0` is suitable for `3`, `4`, and `5.0.0-alpha`. For older releases Craft CMS 3 & 4 since `2.5.0`, before that for Craft CMS 3.x it was used `craft3` branch with versions 1.x, whereas the 2.x branch is for Craft CMS 4. Try to using newest version of plugin for your CraftCMS installation. 
 
 ### Q: My Preloading CRON failed. What could be the reason?
 
