@@ -1,4 +1,10 @@
-# CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.0.0.alpha Changelog
+# CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.x Changelog
+
+## 3.1.0 - 2024-10-06
+
+### Fixed
+
+- Resolved [issue](https://github.com/cooltronicpl/varnishcache/issues/2#issue-2560868356) related to removed and deprecated code in Craft CMS `5.4`. Updated to ensure compatibility with Craft CMS `5.4`.
 
 ## 3.0.0 - 2024-10-05
 

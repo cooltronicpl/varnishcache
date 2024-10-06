@@ -75,7 +75,7 @@ class VarnishCacheService extends Component
             case $this->settings->enableGeneral == false:
                 return false;
 
-            case !$app->getIsSystemOn() && $this->settings->forceOn == false:
+            case !$app->getIsLive() && $this->settings->forceOn == false:
                 return false;
 
             case $app->request->getIsCpRequest():
