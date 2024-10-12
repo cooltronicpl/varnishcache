@@ -60,7 +60,7 @@ class PreloadCacheJob extends BaseJob
             $cacheEntryCreate = new VarnishCachesRecord(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id, 'createdAt' => date('Y-m-d H:i:s')]);
             $cacheEntryCreate->save();
             if ($cacheEntryCreate->hasErrors()) {
-                throw new \Exception('Failed to create entry in Preload Cache Entry workaround: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+                throw new \Exception('Failed to create entry in Preload Cache Entry workaround: ' . StringHelper::toString($this->url));
             }
             $cacheEntry = VarnishCachesRecord::findOne(['uri' => $path, 'siteId' => \Craft::$app->getSites()->getCurrentSite()->id]);
             $content = file_get_contents($this->url);
@@ -75,7 +75,7 @@ class PreloadCacheJob extends BaseJob
             fwrite($fp, $content);
             fclose($fp);
             if ($cacheEntry->hasErrors()) {
-                throw new \Exception('Failed to update entry in Preload: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+                throw new \Exception('Failed to update entry in Preload: ' . StringHelper::toString($this->url));
             }
             $v = new \cooltronicpl\varnishcache\services\VarnishCacheService();
             $v->clearCacheUrl($this->url);
@@ -98,7 +98,7 @@ class PreloadCacheJob extends BaseJob
             \Craft::info('Cache Entry workaround preload sucessful for URL: ' . StringHelper::toString($this->url));
         }
         if (empty($cacheEntry)) {
-            throw new \Exception('Failed to preload Cache Entry workaround for URL, no cache entry: ' . StringHelper::toString($this->url) . '. Error: ' . StringHelper::toString($error));
+            throw new \Exception('Failed to preload Cache Entry workaround for URL, no cache entry: ' . StringHelper::toString($this->url));
         } else {
             \Craft::info('Preload - Cache Entry exist: ' . StringHelper::toString($this->url) . ' filesize: ' . filesize($this->getCacheFileName($cacheEntry->uid)) . " filename: " . $this->getCacheFileName($cacheEntry->uid));
         }
@@ -150,15 +150,11 @@ class PreloadCacheJob extends BaseJob
      *
      * @return string
      */
-
     private function getDirectory()
     {
-        if (defined('CRAFT_STORAGE_PATH')) {
-            $basePath = CRAFT_STORAGE_PATH;
-        } else {
-            $basePath = CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . 'storage';
+        if (!defined('CRAFT_STORAGE_PATH')) {
+            define('CRAFT_STORAGE_PATH', CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . 'storage');
         }
-
-        return $basePath . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'varnishcache' . DIRECTORY_SEPARATOR;
+        return CRAFT_STORAGE_PATH . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'varnishcache' . DIRECTORY_SEPARATOR;
     }
 }

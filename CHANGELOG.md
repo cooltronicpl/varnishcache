@@ -1,5 +1,15 @@
 # CDN Cache & Preload for Craft CMS 3.x, 4.x, 5.x Changelog
 
+## 3.2.0 - 2024-10-12
+
+### Fixed
+
+- Resolved issue related to errors in undeclared variables in code.
+- Fixed various exception handling messages in `PreloadCacheJob`.
+- Improved caching directory management with dynamic definition of `CRAFT_STORAGE_PATH` when not previously defined.
+- Cleaned up unnecessary exception error messages in `PreloadCacheJob`.
+- Improved cache purge logging in `VarnishCacheService`.
+
 ## 3.1.0 - 2024-10-06
 
 ### Fixed

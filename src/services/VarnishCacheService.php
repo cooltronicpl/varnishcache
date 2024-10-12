@@ -258,12 +258,13 @@ class VarnishCacheService extends Component
 
             $this->clearCacheUrl($app->sites->getCurrentSite()->baseUrl . $this->uri);
 
-            \Craft::info('clearCacheUri Purge response: ' . $result . ' file: ' . $file);
+            \Craft::info('clearCacheUri Purge file: ' . $file);
 
             if (file_exists($file)) {
                 @unlink($file);
             }
         }
+        $cachesUri = VarnishCachesRecord::findAll(['uri' => $uri]);
 
         VarnishCachesRecord::deleteAll(['uri' => $cachesUri]);
         return null;
@@ -395,13 +396,10 @@ class VarnishCacheService extends Component
 
     private function getDirectory()
     {
-        if (defined('CRAFT_STORAGE_PATH')) {
-            $basePath = CRAFT_STORAGE_PATH;
-        } else {
-            $basePath = CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . 'storage';
+        if (!defined('CRAFT_STORAGE_PATH')) {
+            define('CRAFT_STORAGE_PATH', CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . 'storage');
         }
-
-        return $basePath . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'varnishcache' . DIRECTORY_SEPARATOR;
+        return CRAFT_STORAGE_PATH . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'varnishcache' . DIRECTORY_SEPARATOR;
     }
 
     /**
